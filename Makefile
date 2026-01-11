@@ -1,4 +1,4 @@
-.PHONY: help install install-dev db-up db-down db-init db-migrate db-upgrade run test test-unit test-integration test-smoke coverage clean format lint
+.PHONY: help install install-dev db-up db-down db-init db-migrate db-upgrade db-downgrade db-current db-history run test test-unit test-integration test-smoke coverage clean format lint
 
 help:  ## Show this help message
 	@echo 'Usage: make [target]'
@@ -7,10 +7,10 @@ help:  ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 install:  ## Install production dependencies
-	pip install -e .
+	pip3 install -e .
 
 install-dev:  ## Install all dependencies including dev tools
-	pip install -e ".[dev]"
+	pip3 install -e ".[dev]"
 
 db-up:  ## Start PostgreSQL container
 	docker-compose up -d
@@ -30,11 +30,21 @@ db-upgrade:  ## Apply all pending migrations
 db-downgrade:  ## Rollback last migration
 	alembic downgrade -1
 
+db-current:  ## Show current migration version
+	alembic current
+
+db-history:  ## Show migration history
+	alembic history --verbose
+
+db-reset:  ## Reset database (downgrade to base and upgrade to head)
+	alembic downgrade base
+	alembic upgrade head
+
 run:  ## Run the bot
-	python main.py
+	python3 main.py
 
 dev:  ## Run bot in development mode with auto-reload
-	python main.py
+	python3 main.py
 
 test:  ## Run all tests with coverage
 	pytest --cov=. --cov-report=term-missing --cov-report=html

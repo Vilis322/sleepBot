@@ -1,10 +1,28 @@
-.PHONY: help install install-dev db-up db-down db-init db-migrate db-upgrade db-downgrade db-current db-history run test test-unit test-integration test-smoke coverage clean format lint
+.PHONY: help venv venv-install install install-dev db-up db-down db-init db-migrate db-upgrade db-downgrade db-current db-history run test test-unit test-integration test-smoke coverage clean format lint
 
 help:  ## Show this help message
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Available targets:'
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+venv:  ## Create virtual environment
+	python3 -m venv .venv
+	@echo ""
+	@echo "✅ Virtual environment created!"
+	@echo "Now activate it with: source .venv/bin/activate"
+	@echo "Then run: make venv-install"
+
+venv-install:  ## Install dependencies in venv (run after activating venv)
+	@if [ -z "$$VIRTUAL_ENV" ]; then \
+		echo "⚠️  Virtual environment not activated!"; \
+		echo "Run: source .venv/bin/activate"; \
+		exit 1; \
+	fi
+	pip install --upgrade pip setuptools wheel
+	pip install -e ".[dev]"
+	@echo ""
+	@echo "✅ Dependencies installed in venv!"
 
 install:  ## Install production dependencies
 	pip3 install -e .
@@ -78,6 +96,22 @@ clean:  ## Clean up generated files
 	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
 	rm -rf htmlcov .coverage coverage.xml
 	@echo "Cleaned up generated files"
+
+setup-venv:  ## Complete setup with virtual environment (RECOMMENDED)
+	@echo "🔧 Creating virtual environment..."
+	make venv
+	@echo ""
+	@echo "⚠️  IMPORTANT: Now run these commands manually:"
+	@echo "   1. source .venv/bin/activate"
+	@echo "   2. make venv-install"
+	@echo "   3. make db-up"
+	@echo "   4. sleep 5"
+	@echo "   5. make db-migrate msg=\"Initial migration\""
+	@echo "   6. make db-upgrade"
+	@echo "   7. make run"
+	@echo ""
+	@echo "Or use the script below (copy-paste):"
+	@echo "source .venv/bin/activate && make venv-install && make db-up && sleep 5 && make db-migrate msg=\"Initial migration\" && make db-upgrade"
 
 setup:  ## Complete local setup (install deps, start db, run migrations)
 	@echo "📦 Installing dependencies..."

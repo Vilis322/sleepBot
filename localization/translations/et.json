@@ -1,0 +1,83 @@
+{
+  "commands": {
+    "start": {
+      "welcome": "👋 Tere tulemast Sleep Boti!",
+      "description": "Jälgige oma und, analüüsige mustreid ja parandage une kvaliteeti.\n\nAlustame kiire seadistusega. Tippige /help, et näha kõiki saadaolevaid käske.",
+      "select_language": "🌍 Palun valige oma eelistatud keel:",
+      "onboarding": {
+        "question_bedtime": "Mis kellaajal te tavaliselt magama lähete? (HH:MM formaat, nt 22:00)",
+        "question_waketime": "Mis kellaajal te tavaliselt üles ärkate? (HH:MM formaat, nt 06:00)",
+        "question_target_hours": "Mitu tundi und on teie eesmärk? (nt 8)",
+        "question_timezone": "Mis on teie ajavöönd? (nt Europe/Tallinn)",
+        "invalid_time": "Vigane aja formaat. Palun kasutage HH:MM formaati (nt 22:00)",
+        "invalid_hours": "Vigane tundide arv. Palun sisestage number vahemikus 1 kuni 24",
+        "invalid_timezone": "Vigane ajavöönd. Palun sisestage kehtiv ajavöönd (nt Europe/Tallinn)",
+        "completed": "✅ Seadistamine lõpetatud! Olete valmis alustama oma une jälgimist.\n\nKasutage /sleep, kui lähete magama ja /wake, kui ärkate."
+      }
+    },
+    "help": {
+      "title": "📚 Saadaolevad käsud",
+      "commands_list": "/start - Käivitage bot ja konfigureerige eelistused\n/help - Kuva see abiteade\n/language - Muuda liidese keelt\n/sleep - Alusta une jälgimist\n/wake - Lõpeta jälgimine ja vaata statistikat\n/quality <hinnang> - Hinda oma une kvaliteeti (1-10)\n/note <tekst> - Lisa oma une kohta märkmeid\n/stats - Vaata ja ekspordi oma une statistikat"
+    },
+    "language": {
+      "select": "🌍 Valige oma keel:",
+      "changed": "✅ Keel muudetud eesti keeleks"
+    },
+    "sleep": {
+      "started": "😴 Une jälgimine algas kell {time}\n\nHead ööd! Kasutage /wake, kui ärkate.",
+      "already_active": "⚠️ Teil on juba aktiivne uneseanss, mis algas kell {time}\n\nMida soovite teha?",
+      "already_active_save_and_start": "💾 Salvesta praegune seanss ({duration}h {minutes}m) ja alusta uut",
+      "already_active_continue": "▶️ Jätka praegust seanssi",
+      "already_active_cancel_and_start": "🔄 Tühista praegune ja alusta uut",
+      "session_saved": "✅ Eelmine uneseanss salvestatud ({duration}h {minutes}m)\n😴 Uus uneseanss algas kell {time}",
+      "session_cancelled": "🔄 Eelmine seanss tühistatud\n😴 Uus uneseanss algas kell {time}"
+    },
+    "wake": {
+      "no_active_session": "⚠️ Teil ei ole aktiivset uneseanssi.\n\nKasutage /sleep, et alustada oma une jälgimist.",
+      "completed": "☀️ Tere hommikust!\n\n📊 <b>Une statistika:</b>\n⏰ Magamamineku aeg: {sleep_time}\n⏰ Ärkamise aeg: {wake_time}\n⏱ Kestus: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 Saate:\n• Hinnata kvaliteeti: /quality <1-10>\n• Lisada märkmeid: /note <teie märkmed>",
+      "goal_met": "🎯 Te magasite {duration}h {minutes}m, see on {percentage}% teie eesmärgist ({target_hours}h)! Suurepärane töö!",
+      "goal_not_met": "📉 Te magasite {duration}h {minutes}m, see on {percentage}% teie eesmärgist ({target_hours}h). Proovige täna õhtul rohkem magada!",
+      "no_goal": "Seadke oma une eesmärgid käsuga /start, et saada isikupärastatud soovitusi."
+    },
+    "quality": {
+      "no_last_session": "⚠️ Uneseanssi ei leitud.\n\nLõpetage kõigepealt uneseanss käskudega /sleep ja /wake",
+      "already_rated": "⚠️ Olete selle seanssi juba hinnanud {rating}/10.\n\nKas soovite hinnangut uuendada?",
+      "invalid_format": "⚠️ Vigane formaat. Palun kasutage: /quality <number>\n\nNäide: /quality 8 või /quality 7.5",
+      "invalid_range": "⚠️ Hinnang peab olema vahemikus 1 kuni 10.\n\nNäide: /quality 8",
+      "saved": "✅ Une kvaliteet hinnatud: {rating}/10\n\nTäname tagasiside eest!"
+    },
+    "note": {
+      "no_last_session": "⚠️ Uneseanssi ei leitud.\n\nLõpetage kõigepealt uneseanss käskudega /sleep ja /wake",
+      "empty": "⚠️ Palun esitage märkus.\n\nNäide: /note Mul oli raske magama jääda",
+      "saved": "✅ Märkus salvestatud teie viimase uneseanssi jaoks:\n\n\"{note}\"",
+      "updated": "✅ Märkus uuendatud teie viimase uneseanssi jaoks:\n\n\"{note}\""
+    },
+    "stats": {
+      "title": "📊 Une statistika",
+      "select_period": "Valige ajaperiood:",
+      "select_format": "Valige ekspordi formaat:",
+      "period_week": "📅 Viimased 7 päeva",
+      "period_month": "📅 Viimased 30 päeva",
+      "period_all": "📅 Kogu aeg",
+      "period_custom": "📅 Kohandatud vahemik",
+      "format_csv": "📄 CSV fail",
+      "format_json": "📄 JSON fail",
+      "no_data": "📭 Valitud perioodil une andmeid ei leitud.\n\nAlustage oma une jälgimist käskudega /sleep ja /wake!",
+      "exported": "✅ Une statistika eksporditud!\n\n📊 Kokkuvõte:\n• Seansside arv kokku: {total_sessions}\n• Keskmine kestus: {avg_duration}h\n• Keskmine kvaliteet: {avg_quality}/10\n\nTeie andmed on allpool lisatud.",
+      "custom_date_from": "Sisestage alguskuupäev (YYYY-MM-DD):",
+      "custom_date_to": "Sisestage lõppkuupäev (YYYY-MM-DD):",
+      "invalid_date": "⚠️ Vigane kuupäeva formaat. Palun kasutage YYYY-MM-DD formaati (nt 2026-01-01)",
+      "date_out_of_range": "⚠️ Kuupäev on väljaspool teie jälgimisperioodi.\n\nAlustasite boti kasutamist kuupäeval {first_date}"
+    }
+  },
+  "errors": {
+    "generic": "❌ Tekkis viga. Palun proovige hiljem uuesti.",
+    "database": "❌ Andmebaasi viga. Palun võtke ühendust toega.",
+    "not_implemented": "🚧 See funktsioon tuleb varsti!"
+  },
+  "buttons": {
+    "cancel": "❌ Tühista",
+    "back": "⬅️ Tagasi",
+    "confirm": "✅ Kinnita"
+  }
+}

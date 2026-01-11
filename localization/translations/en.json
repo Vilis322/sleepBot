@@ -1,0 +1,83 @@
+{
+  "commands": {
+    "start": {
+      "welcome": "👋 Welcome to Sleep Bot!",
+      "description": "Track your sleep, analyze patterns, and improve your sleep quality.\n\nLet's get started with a quick setup. Type /help to see all available commands.",
+      "select_language": "🌍 Please select your preferred language:",
+      "onboarding": {
+        "question_bedtime": "What time do you usually go to bed? (HH:MM format, e.g., 22:00)",
+        "question_waketime": "What time do you usually wake up? (HH:MM format, e.g., 06:00)",
+        "question_target_hours": "How many hours of sleep is your goal? (e.g., 8)",
+        "question_timezone": "What is your timezone? (e.g., Europe/Tallinn, America/New_York)",
+        "invalid_time": "Invalid time format. Please use HH:MM format (e.g., 22:00)",
+        "invalid_hours": "Invalid hours. Please enter a number between 1 and 24",
+        "invalid_timezone": "Invalid timezone. Please enter a valid timezone (e.g., Europe/Tallinn)",
+        "completed": "✅ Setup completed! You're all set to start tracking your sleep.\n\nUse /sleep when you go to bed and /wake when you wake up."
+      }
+    },
+    "help": {
+      "title": "📚 Available Commands",
+      "commands_list": "/start - Initialize bot and configure preferences\n/help - Show this help message\n/language - Change interface language\n/sleep - Start sleep tracking\n/wake - Stop tracking and view statistics\n/quality <rating> - Rate your sleep quality (1-10)\n/note <text> - Add notes about your sleep\n/stats - View and export your sleep statistics"
+    },
+    "language": {
+      "select": "🌍 Select your language:",
+      "changed": "✅ Language changed to English"
+    },
+    "sleep": {
+      "started": "😴 Sleep tracking started at {time}\n\nGood night! Use /wake when you wake up.",
+      "already_active": "⚠️ You already have an active sleep session started at {time}\n\nWhat would you like to do?",
+      "already_active_save_and_start": "💾 Save current session ({duration}h {minutes}m) and start new",
+      "already_active_continue": "▶️ Continue current session",
+      "already_active_cancel_and_start": "🔄 Cancel current and start new",
+      "session_saved": "✅ Previous sleep session saved ({duration}h {minutes}m)\n😴 New sleep session started at {time}",
+      "session_cancelled": "🔄 Previous session cancelled\n😴 New sleep session started at {time}"
+    },
+    "wake": {
+      "no_active_session": "⚠️ You don't have an active sleep session.\n\nUse /sleep to start tracking your sleep.",
+      "completed": "☀️ Good morning!\n\n📊 <b>Sleep Statistics:</b>\n⏰ Sleep time: {sleep_time}\n⏰ Wake time: {wake_time}\n⏱ Duration: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 You can:\n• Rate quality: /quality <1-10>\n• Add notes: /note <your notes>",
+      "goal_met": "🎯 You slept {duration}h {minutes}m, that's {percentage}% of your goal ({target_hours}h)! Great job!",
+      "goal_not_met": "📉 You slept {duration}h {minutes}m, that's {percentage}% of your goal ({target_hours}h). Try to sleep more tonight!",
+      "no_goal": "Set your sleep goals with /start to get personalized insights."
+    },
+    "quality": {
+      "no_last_session": "⚠️ No sleep session found.\n\nComplete a sleep session first with /sleep and /wake",
+      "already_rated": "⚠️ You already rated this session with {rating}/10.\n\nDo you want to update it?",
+      "invalid_format": "⚠️ Invalid format. Please use: /quality <number>\n\nExample: /quality 8 or /quality 7.5",
+      "invalid_range": "⚠️ Rating must be between 1 and 10.\n\nExample: /quality 8",
+      "saved": "✅ Sleep quality rated: {rating}/10\n\nThank you for your feedback!"
+    },
+    "note": {
+      "no_last_session": "⚠️ No sleep session found.\n\nComplete a sleep session first with /sleep and /wake",
+      "empty": "⚠️ Please provide a note.\n\nExample: /note Had trouble falling asleep",
+      "saved": "✅ Note saved for your last sleep session:\n\n\"{note}\"",
+      "updated": "✅ Note updated for your last sleep session:\n\n\"{note}\""
+    },
+    "stats": {
+      "title": "📊 Sleep Statistics",
+      "select_period": "Select time period:",
+      "select_format": "Select export format:",
+      "period_week": "📅 Last 7 days",
+      "period_month": "📅 Last 30 days",
+      "period_all": "📅 All time",
+      "period_custom": "📅 Custom range",
+      "format_csv": "📄 CSV file",
+      "format_json": "📄 JSON file",
+      "no_data": "📭 No sleep data found for the selected period.\n\nStart tracking your sleep with /sleep and /wake!",
+      "exported": "✅ Sleep statistics exported!\n\n📊 Summary:\n• Total sessions: {total_sessions}\n• Average duration: {avg_duration}h\n• Average quality: {avg_quality}/10\n\nYour data is attached below.",
+      "custom_date_from": "Enter start date (YYYY-MM-DD):",
+      "custom_date_to": "Enter end date (YYYY-MM-DD):",
+      "invalid_date": "⚠️ Invalid date format. Please use YYYY-MM-DD format (e.g., 2026-01-01)",
+      "date_out_of_range": "⚠️ Date is outside your tracking period.\n\nYou started using the bot on {first_date}"
+    }
+  },
+  "errors": {
+    "generic": "❌ An error occurred. Please try again later.",
+    "database": "❌ Database error. Please contact support.",
+    "not_implemented": "🚧 This feature is coming soon!"
+  },
+  "buttons": {
+    "cancel": "❌ Cancel",
+    "back": "⬅️ Back",
+    "confirm": "✅ Confirm"
+  }
+}

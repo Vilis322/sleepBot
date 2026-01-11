@@ -1,4 +1,4 @@
-.PHONY: help venv venv-install install install-dev db-up db-down db-init db-migrate db-upgrade db-downgrade db-current db-history run test test-unit test-integration test-smoke coverage clean format lint
+.PHONY: help venv venv-install venv-remove venv-status install install-dev db-up db-down db-init db-migrate db-upgrade db-downgrade db-current db-history run test test-unit test-integration test-smoke coverage clean format lint
 
 help:  ## Show this help message
 	@echo 'Usage: make [target]'
@@ -6,23 +6,77 @@ help:  ## Show this help message
 	@echo 'Available targets:'
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-venv:  ## Create virtual environment
-	python3 -m venv .venv
-	@echo ""
-	@echo "✅ Virtual environment created!"
-	@echo "Now activate it with: source .venv/bin/activate"
-	@echo "Then run: make venv-install"
+venv:  ## Create virtual environment (checks if exists)
+	@if [ -d ".venv" ]; then \
+		echo "✅ Virtual environment already exists at .venv"; \
+		if [ -n "$$VIRTUAL_ENV" ]; then \
+			echo "✅ Virtual environment is ACTIVATED"; \
+		else \
+			echo "⚠️  Virtual environment is NOT activated"; \
+			echo "Run: source .venv/bin/activate"; \
+		fi; \
+	else \
+		echo "🔧 Creating virtual environment..."; \
+		python3 -m venv .venv; \
+		echo ""; \
+		echo "✅ Virtual environment created at .venv"; \
+		echo ""; \
+		echo "📝 Next steps:"; \
+		echo "   1. Activate: source .venv/bin/activate"; \
+		echo "   2. Install: make venv-install"; \
+		echo ""; \
+		echo "💡 Tip: Add this alias to your ~/.zshrc or ~/.bashrc:"; \
+		echo "   alias venv='source .venv/bin/activate'"; \
+	fi
+
+venv-status:  ## Check virtual environment status
+	@echo "🔍 Virtual environment status:"
+	@if [ -d ".venv" ]; then \
+		echo "   ✅ .venv directory exists"; \
+		if [ -n "$$VIRTUAL_ENV" ]; then \
+			echo "   ✅ Virtual environment is ACTIVATED"; \
+			echo "   📍 Location: $$VIRTUAL_ENV"; \
+			echo "   🐍 Python: $$(python --version)"; \
+			echo "   📦 Pip: $$(pip --version)"; \
+		else \
+			echo "   ⚠️  Virtual environment is NOT activated"; \
+			echo "   💡 Run: source .venv/bin/activate"; \
+		fi; \
+	else \
+		echo "   ❌ .venv directory does not exist"; \
+		echo "   💡 Run: make venv"; \
+	fi
 
 venv-install:  ## Install dependencies in venv (run after activating venv)
 	@if [ -z "$$VIRTUAL_ENV" ]; then \
-		echo "⚠️  Virtual environment not activated!"; \
-		echo "Run: source .venv/bin/activate"; \
+		echo "❌ Virtual environment not activated!"; \
+		echo ""; \
+		echo "Please run:"; \
+		echo "   source .venv/bin/activate"; \
+		echo "   make venv-install"; \
 		exit 1; \
 	fi
+	@echo "📦 Installing dependencies in virtual environment..."
 	pip install --upgrade pip setuptools wheel
 	pip install -e ".[dev]"
 	@echo ""
 	@echo "✅ Dependencies installed in venv!"
+	@echo "🐍 Python: $$(python --version)"
+	@echo "📦 Pip: $$(pip --version)"
+
+venv-remove:  ## Remove virtual environment
+	@if [ -n "$$VIRTUAL_ENV" ]; then \
+		echo "❌ Cannot remove venv while it's activated!"; \
+		echo "First run: deactivate"; \
+		exit 1; \
+	fi
+	@if [ -d ".venv" ]; then \
+		echo "🗑️  Removing virtual environment..."; \
+		rm -rf .venv; \
+		echo "✅ Virtual environment removed"; \
+	else \
+		echo "ℹ️  No virtual environment found"; \
+	fi
 
 install:  ## Install production dependencies
 	pip3 install -e .

@@ -18,7 +18,7 @@ Telegram bot for sleep tracking with multi-language support (English, Russian, E
 - **Logging**: structlog
 - **Testing**: pytest with 95%+ coverage
 - **CI/CD**: GitHub Actions
-- **Process Manager**: PM2
+- **Deployment**: Docker + Docker Compose
 
 ## Local Development
 
@@ -99,7 +99,12 @@ make test-smoke         # Smoke tests
 
 ## Deployment
 
-The bot automatically deploys to `/opt/sleepbot` on push to `main` branch via GitHub Actions.
+The bot uses Docker for production deployment. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+**Quick Deploy:**
+- Automatically deploys via GitHub Actions on push to `main` branch
+- Uses Docker Compose for container orchestration
+- PostgreSQL data persisted in Docker volumes
 
 ## Architecture
 

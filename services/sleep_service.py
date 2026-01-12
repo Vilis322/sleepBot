@@ -96,23 +96,11 @@ class SleepService:
         # Check if there's already an active session
         active_session = await self.get_active_session(user)
         if active_session:
-            logger.warning(
-                "attempted_duplicate_sleep_start",
-                user_id=user.id,
-                telegram_id=user.telegram_id,
-            )
             raise ValueError("User already has an active sleep session")
 
         # Create new session with current time in UTC
         now = datetime.now(pytz.UTC)
         session = await self.repository.start_sleep_session(user.id, now)
-
-        logger.info(
-            "sleep_session_started",
-            user_id=user.id,
-            telegram_id=user.telegram_id,
-            sleep_start=now.isoformat(),
-        )
 
         return session
 
@@ -130,23 +118,11 @@ class SleepService:
         """
         active_session = await self.get_active_session(user)
         if not active_session:
-            logger.warning(
-                "no_active_session_to_end",
-                user_id=user.id,
-                telegram_id=user.telegram_id,
-            )
             raise ValueError("No active sleep session found")
 
         # End session with current time in UTC
         now = datetime.now(pytz.UTC)
         session = await self.repository.end_sleep_session(active_session, now)
-
-        logger.info(
-            "sleep_session_ended",
-            user_id=user.id,
-            telegram_id=user.telegram_id,
-            duration_hours=session.duration_hours,
-        )
 
         return session
 
@@ -159,11 +135,6 @@ class SleepService:
         active_session = await self.get_active_session(user)
         if active_session:
             await self.repository.delete(active_session)
-            logger.info(
-                "sleep_session_cancelled",
-                user_id=user.id,
-                telegram_id=user.telegram_id,
-            )
 
     async def get_last_completed_session(self, user: User) -> Optional[SleepSession]:
         """Get user's most recent completed session.

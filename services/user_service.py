@@ -5,9 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import User
 from repositories.user_repository import UserRepository
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class UserService:
@@ -57,16 +54,6 @@ class UserService:
             last_name=last_name,
             timezone=timezone,
         )
-
-        if is_created:
-            logger.info(
-                "new_user_registered",
-                telegram_id=telegram_id,
-                language=lang,
-                timezone=timezone,
-            )
-        else:
-            logger.debug("existing_user_retrieved", telegram_id=telegram_id)
 
         return user, is_created
 

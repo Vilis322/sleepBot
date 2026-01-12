@@ -6,9 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import User
 from repositories.base import BaseRepository
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class UserRepository(BaseRepository[User]):
@@ -67,12 +64,6 @@ class UserRepository(BaseRepository[User]):
             timezone=timezone,
             is_onboarded=False,
         )
-        logger.info(
-            "user_created",
-            telegram_id=telegram_id,
-            username=username,
-            language=language_code,
-        )
         return user
 
     async def get_or_create_user(
@@ -122,11 +113,6 @@ class UserRepository(BaseRepository[User]):
             Updated user
         """
         user = await self.update(user, language_code=language_code)
-        logger.info(
-            "user_language_updated",
-            telegram_id=user.telegram_id,
-            language=language_code,
-        )
         return user
 
     async def update_timezone(self, user: User, timezone: str) -> User:
@@ -140,11 +126,6 @@ class UserRepository(BaseRepository[User]):
             Updated user
         """
         user = await self.update(user, timezone=timezone)
-        logger.info(
-            "user_timezone_updated",
-            telegram_id=user.telegram_id,
-            timezone=timezone,
-        )
         return user
 
     async def complete_onboarding(
@@ -171,11 +152,6 @@ class UserRepository(BaseRepository[User]):
             target_bedtime=target_bedtime,
             target_wake_time=target_wake_time,
             target_sleep_hours=target_sleep_hours,
-        )
-        logger.info(
-            "user_onboarding_completed",
-            telegram_id=user.telegram_id,
-            target_hours=target_sleep_hours,
         )
         return user
 
@@ -206,9 +182,4 @@ class UserRepository(BaseRepository[User]):
             updates["target_sleep_hours"] = target_sleep_hours
 
         user = await self.update(user, **updates)
-        logger.info(
-            "user_sleep_goals_updated",
-            telegram_id=user.telegram_id,
-            updates=updates,
-        )
         return user

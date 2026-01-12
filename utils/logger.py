@@ -47,6 +47,11 @@ def setup_logging() -> None:
         level=log_level,
     )
 
+    # Disable SQLAlchemy verbose logging (keep only warnings and errors)
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+    logging.getLogger("sqlalchemy.pool").setLevel(logging.WARNING)
+    logging.getLogger("sqlalchemy.dialects").setLevel(logging.WARNING)
+
     # Processors common to both dev and prod
     common_processors = [
         structlog.contextvars.merge_contextvars,

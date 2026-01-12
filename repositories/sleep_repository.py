@@ -6,9 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.sleep_session import SleepSession
 from repositories.base import BaseRepository
-from utils.logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class SleepRepository(BaseRepository[SleepSession]):
@@ -79,11 +76,6 @@ class SleepRepository(BaseRepository[SleepSession]):
             user_id=user_id,
             sleep_start=sleep_start,
         )
-        logger.info(
-            "sleep_session_started",
-            user_id=user_id,
-            sleep_start=sleep_start.isoformat(),
-        )
         return session
 
     async def end_sleep_session(
@@ -108,13 +100,6 @@ class SleepRepository(BaseRepository[SleepSession]):
             sleep_end=sleep_end,
             duration_hours=duration_hours,
         )
-        logger.info(
-            "sleep_session_ended",
-            user_id=session.user_id,
-            sleep_start=session.sleep_start.isoformat(),
-            sleep_end=sleep_end.isoformat(),
-            duration_hours=duration_hours,
-        )
         return session
 
     async def add_quality_rating(
@@ -130,12 +115,6 @@ class SleepRepository(BaseRepository[SleepSession]):
             Updated sleep session
         """
         session = await self.update(session, quality_rating=quality_rating)
-        logger.info(
-            "sleep_quality_rated",
-            user_id=session.user_id,
-            session_id=session.id,
-            quality=quality_rating,
-        )
         return session
 
     async def add_note(self, session: SleepSession, note: str) -> SleepSession:
@@ -149,11 +128,6 @@ class SleepRepository(BaseRepository[SleepSession]):
             Updated sleep session
         """
         session = await self.update(session, note=note)
-        logger.info(
-            "sleep_note_added",
-            user_id=session.user_id,
-            session_id=session.id,
-        )
         return session
 
     async def get_sessions_by_date_range(

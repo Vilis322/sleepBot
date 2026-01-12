@@ -59,10 +59,10 @@ async def cmd_sleep(message: Message, lang: str, loc: LocalizationService) -> No
                     reply_markup=get_sleep_conflict_keyboard(duration_hours, duration_minutes),
                 )
 
-                logger.info(
-                    "sleep_conflict_detected",
+                logger.warning(
+                    "sleep_active",
                     telegram_id=message.from_user.id,
-                    active_session_id=active_session.id,
+                    session_id=active_session.id,
                 )
 
             else:
@@ -75,13 +75,13 @@ async def cmd_sleep(message: Message, lang: str, loc: LocalizationService) -> No
                 await message.answer(success_msg)
 
                 logger.info(
-                    "sleep_session_started",
+                    "sleep_started",
                     telegram_id=message.from_user.id,
                     session_id=new_session.id,
                 )
 
         except Exception as e:
-            logger.error("sleep_command_error", telegram_id=message.from_user.id, error=str(e))
+            logger.error("sleep_error", telegram_id=message.from_user.id, error=str(e))
             await message.answer(loc.get("errors.generic", lang))
 
 
@@ -128,14 +128,13 @@ async def handle_sleep_save_and_start(callback: CallbackQuery, lang: str, loc: L
                 await callback.answer()
 
                 logger.info(
-                    "sleep_save_and_start",
+                    "sleep_saved",
                     telegram_id=callback.from_user.id,
-                    old_session_id=completed_session.id,
-                    new_session_id=new_session.id,
+                    session_id=new_session.id,
                 )
 
         except Exception as e:
-            logger.error("sleep_save_and_start_error", telegram_id=callback.from_user.id, error=str(e))
+            logger.error("sleep_save_error", telegram_id=callback.from_user.id, error=str(e))
             await callback.answer(loc.get("errors.generic", lang), show_alert=True)
 
 
@@ -151,7 +150,7 @@ async def handle_sleep_continue(callback: CallbackQuery, lang: str, loc: Localiz
     await callback.message.delete()
     await callback.answer(loc.get("commands.sleep.already_active_continue", lang))
 
-    logger.info("sleep_continue", telegram_id=callback.from_user.id)
+    logger.debug("sleep_continued", telegram_id=callback.from_user.id)
 
 
 @router.callback_query(F.data == "sleep_cancel_and_start")
@@ -189,11 +188,11 @@ async def handle_sleep_cancel_and_start(callback: CallbackQuery, lang: str, loc:
             await callback.answer()
 
             logger.info(
-                "sleep_cancel_and_start",
+                "sleep_restarted",
                 telegram_id=callback.from_user.id,
-                new_session_id=new_session.id,
+                session_id=new_session.id,
             )
 
         except Exception as e:
-            logger.error("sleep_cancel_and_start_error", telegram_id=callback.from_user.id, error=str(e))
+            logger.error("sleep_restart_error", telegram_id=callback.from_user.id, error=str(e))
             await callback.answer(loc.get("errors.generic", lang), show_alert=True)

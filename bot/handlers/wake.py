@@ -42,7 +42,7 @@ async def cmd_wake(message: Message, lang: str, loc: LocalizationService) -> Non
                 # No active session
                 no_session_msg = loc.get("commands.wake.no_active_session", lang)
                 await message.answer(no_session_msg)
-                logger.info("wake_no_active_session", telegram_id=message.from_user.id)
+                logger.warning("no_sleep_session", telegram_id=message.from_user.id)
                 return
 
             # End the session
@@ -99,12 +99,12 @@ async def cmd_wake(message: Message, lang: str, loc: LocalizationService) -> Non
             await message.answer(completion_msg, parse_mode="HTML")
 
             logger.info(
-                "wake_session_completed",
+                "wake_completed",
                 telegram_id=message.from_user.id,
                 session_id=completed_session.id,
-                duration_hours=completed_session.duration_hours,
+                duration=completed_session.duration_hours,
             )
 
         except Exception as e:
-            logger.error("wake_command_error", telegram_id=message.from_user.id, error=str(e))
+            logger.error("wake_error", telegram_id=message.from_user.id, error=str(e))
             await message.answer(loc.get("errors.generic", lang))

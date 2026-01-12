@@ -10,7 +10,7 @@ logger = get_logger(__name__)
 # Create async engine
 engine = create_async_engine(
     settings.database_url,
-    echo=settings.is_development,  # Log SQL queries in development
+    echo=False,  # Disable SQL query logging (too verbose)
     pool_pre_ping=True,  # Verify connections before using
     pool_size=10,
     max_overflow=20,

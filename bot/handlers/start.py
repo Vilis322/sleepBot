@@ -52,9 +52,9 @@ async def cmd_start(
                 await message.answer(language_prompt, reply_markup=get_language_keyboard())
 
                 logger.info(
-                    "start_command_new_user",
+                    "user_started",
                     telegram_id=user.id,
-                    is_created=is_created,
+                    new_user=is_created,
                 )
             else:
                 # Existing user - show welcome back message
@@ -63,10 +63,10 @@ async def cmd_start(
 
                 await message.answer(f"{welcome_text}\n\n{help_text}")
 
-                logger.info("start_command_existing_user", telegram_id=user.id)
+                logger.debug("user_returning", telegram_id=user.id)
 
         except Exception as e:
-            logger.error("start_command_error", telegram_id=user.id, error=str(e))
+            logger.error("start_error", telegram_id=user.id, error=str(e))
             await message.answer(loc.get("errors.generic", lang))
 
 
@@ -112,14 +112,14 @@ async def handle_language_selection(
                 await callback.answer()
 
                 logger.info(
-                    "language_selected",
+                    "lang_selected",
                     telegram_id=callback.from_user.id,
-                    language=selected_lang,
+                    lang=selected_lang,
                 )
 
         except Exception as e:
             logger.error(
-                "language_selection_error",
+                "lang_error",
                 telegram_id=callback.from_user.id,
                 error=str(e),
             )

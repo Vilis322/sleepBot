@@ -49,26 +49,6 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-async def get_db_session() -> AsyncSession:
-    """Get database session for use in middleware and handlers that need early return.
-
-    Returns:
-        AsyncSession: Database session that must be manually closed
-
-    Example:
-        >>> session = await get_db_session()
-        >>> try:
-        ...     result = await session.execute(select(User))
-        ...     await session.commit()
-        ... except Exception:
-        ...     await session.rollback()
-        ...     raise
-        ... finally:
-        ...     await session.close()
-    """
-    return async_session_maker()
-
-
 async def init_database() -> None:
     """Initialize database tables (for testing purposes only).
 

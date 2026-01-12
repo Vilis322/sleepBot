@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
 from bot.keyboards.inline import get_language_keyboard
-from database import get_db_session
+from database import get_session
 from localization import LocalizationService
 from services.user_service import UserService
 from utils.logger import get_logger
@@ -44,34 +44,34 @@ async def handle_language_change(
 
     selected_lang = callback.data.split("_")[-1]  # Extract language code
 
-    session = await get_db_session()
-    try:
-        user_service = UserService(session)
-        db_user = await user_service.get_user_by_telegram_id(callback.from_user.id)
+    async for session in get_session():
+        try:
+            user_service = UserService(session)
+            db_user = await user_service.get_user_by_telegram_id(callback.from_user.id)
 
-        if db_user:
-            # Update language
-            await user_service.update_language(db_user, selected_lang)
+            if db_user:
+                # Update language
+                await user_service.update_language(db_user, selected_lang)
 
-            # Send confirmation
-            changed_msg = loc.get("commands.language.changed", selected_lang)
-            await callback.message.edit_text(changed_msg)
-            await callback.answer()
+                # Send confirmation
+                changed_msg = loc.get("commands.language.changed", selected_lang)
+                await callback.message.edit_text(changed_msg)
+                await callback.answer()
 
-            logger.info(
-                "language_changed",
+                logger.info(
+                    "language_changed",
+                    telegram_id=callback.from_user.id,
+                    language=selected_lang,
+                )
+
+        except Exception as e:
+            logger.error(
+                "language_change_error",
                 telegram_id=callback.from_user.id,
-                language=selected_lang,
+                error=str(e),
             )
+            await callback.answer(loc.get("errors.generic", selected_lang), show_alert=True)
 
+        # Commit before break - otherwise changes won't be saved
         await session.commit()
-    except Exception as e:
-        await session.rollback()
-        logger.error(
-            "language_change_error",
-            telegram_id=callback.from_user.id,
-            error=str(e),
-        )
-        await callback.answer(loc.get("errors.generic", selected_lang), show_alert=True)
-    finally:
-        await session.close()
+        break

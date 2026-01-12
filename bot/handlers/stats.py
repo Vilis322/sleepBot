@@ -5,6 +5,7 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, BufferedInputFile
+from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback, get_user_locale
 
 from bot.keyboards.inline import get_stats_period_keyboard, get_stats_format_keyboard
 from bot.states.onboarding import StatsStates
@@ -59,7 +60,7 @@ async def cmd_stats(message: Message, state: FSMContext, lang: str, loc: Localiz
 
             await message.answer(
                 f"{title}\n\n{select_period}",
-                reply_markup=get_stats_period_keyboard(),
+                reply_markup=get_stats_period_keyboard(loc, lang),
             )
 
             await state.set_state(StatsStates.waiting_for_period)
@@ -89,9 +90,13 @@ async def handle_period_selection(
     period = callback.data.split("_")[-1]  # week, month, all, custom
 
     if period == "custom":
-        # Ask for custom date range
+        # Show calendar for start date selection
         date_from_msg = loc.get("commands.stats.custom_date_from", lang)
-        await callback.message.edit_text(date_from_msg)
+        calendar = SimpleCalendar(locale=get_user_locale(lang))
+        await callback.message.edit_text(
+            date_from_msg,
+            reply_markup=await calendar.start_calendar()
+        )
         await state.set_state(StatsStates.waiting_for_custom_date_from)
         await callback.answer()
         return
@@ -116,9 +121,74 @@ async def handle_period_selection(
 
     # Show format selection
     select_format = loc.get("commands.stats.select_format", lang)
-    await callback.message.edit_text(select_format, reply_markup=get_stats_format_keyboard())
+    await callback.message.edit_text(select_format, reply_markup=get_stats_format_keyboard(loc, lang))
     await state.set_state(StatsStates.waiting_for_format)
     await callback.answer()
+
+
+@router.callback_query(StatsStates.waiting_for_custom_date_from, SimpleCalendarCallback.filter())
+async def handle_start_date_selection(
+    callback: CallbackQuery, callback_data: SimpleCalendarCallback, state: FSMContext, lang: str, loc: LocalizationService
+) -> None:
+    """Handle start date selection from calendar.
+
+    Args:
+        callback: Callback query
+        callback_data: Calendar callback data
+        state: FSM context
+        lang: User's language code
+        loc: Localization service
+    """
+    calendar = SimpleCalendar(locale=get_user_locale(lang))
+    selected, date = await calendar.process_selection(callback, callback_data)
+
+    if selected:
+        # Save start date and show calendar for end date
+        await state.update_data(start_date=date)
+        date_to_msg = loc.get("commands.stats.custom_date_to", lang)
+        await callback.message.edit_text(
+            date_to_msg,
+            reply_markup=await calendar.start_calendar(year=date.year, month=date.month)
+        )
+        await state.set_state(StatsStates.waiting_for_custom_date_to)
+
+
+@router.callback_query(StatsStates.waiting_for_custom_date_to, SimpleCalendarCallback.filter())
+async def handle_end_date_selection(
+    callback: CallbackQuery, callback_data: SimpleCalendarCallback, state: FSMContext, lang: str, loc: LocalizationService
+) -> None:
+    """Handle end date selection from calendar.
+
+    Args:
+        callback: Callback query
+        callback_data: Calendar callback data
+        state: FSM context
+        lang: User's language code
+        loc: Localization service
+    """
+    calendar = SimpleCalendar(locale=get_user_locale(lang))
+    selected, date = await calendar.process_selection(callback, callback_data)
+
+    if selected:
+        data = await state.get_data()
+        start_date = data.get("start_date")
+
+        # Validate date range
+        if start_date and date < start_date:
+            error_msg = loc.get("commands.stats.invalid_date", lang)
+            await callback.answer(error_msg, show_alert=True)
+            return
+
+        # Save dates and show format selection
+        end_date = date.replace(hour=23, minute=59, second=59)
+        start_date = start_date.replace(hour=0, minute=0, second=0)
+        date_range = f"{start_date.strftime('%Y-%m-%d')} - {end_date.strftime('%Y-%m-%d')}"
+
+        await state.update_data(start_date=start_date, end_date=end_date, date_range=date_range)
+
+        select_format = loc.get("commands.stats.select_format", lang)
+        await callback.message.edit_text(select_format, reply_markup=get_stats_format_keyboard(loc, lang))
+        await state.set_state(StatsStates.waiting_for_format)
 
 
 @router.callback_query(StatsStates.waiting_for_format, F.data.startswith("stats_format_"))
@@ -217,6 +287,6 @@ async def handle_stats_back(callback: CallbackQuery, state: FSMContext, lang: st
     """
     # Go back to period selection
     select_period = loc.get("commands.stats.select_period", lang)
-    await callback.message.edit_text(select_period, reply_markup=get_stats_period_keyboard())
+    await callback.message.edit_text(select_period, reply_markup=get_stats_period_keyboard(loc, lang))
     await state.set_state(StatsStates.waiting_for_period)
     await callback.answer()

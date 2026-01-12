@@ -13,13 +13,14 @@ dependencies = [
     "sqlalchemy[asyncio]==2.0.36",
     "asyncpg==0.30.0",
     "alembic==1.14.0",
-    "pydantic==2.10.4",
+    "pydantic==2.9.2",
     "pydantic-settings==2.6.1",
     "python-dotenv==1.0.1",
     "structlog==24.4.0",
     "colorama==0.4.6",
     "pytz==2024.2",
     "pandas==2.2.3",
+    "aiogram-calendar==0.6.0",
 ]
 
 [project.optional-dependencies]

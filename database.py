@@ -33,8 +33,9 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         AsyncSession: Database session
 
     Example:
-        >>> async with get_session() as session:
+        >>> async for session in get_session():
         ...     result = await session.execute(select(User))
+        ...     break  # Important: must break or return before end of block
     """
     async with async_session_maker() as session:
         try:
@@ -46,6 +47,26 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
+
+
+async def get_db_session() -> AsyncSession:
+    """Get database session for use in middleware and handlers that need early return.
+
+    Returns:
+        AsyncSession: Database session that must be manually closed
+
+    Example:
+        >>> session = await get_db_session()
+        >>> try:
+        ...     result = await session.execute(select(User))
+        ...     await session.commit()
+        ... except Exception:
+        ...     await session.rollback()
+        ...     raise
+        ... finally:
+        ...     await session.close()
+    """
+    return async_session_maker()
 
 
 async def init_database() -> None:

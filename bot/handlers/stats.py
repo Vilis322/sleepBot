@@ -9,7 +9,7 @@ from aiogram_calendar import SimpleCalendar, SimpleCalendarCallback, get_user_lo
 
 from bot.keyboards.inline import get_stats_period_keyboard, get_stats_format_keyboard
 from bot.states.onboarding import StatsStates
-from database import get_session
+from database import get_db_session
 from localization import LocalizationService
 from services.sleep_service import SleepService
 from services.statistics_service import StatisticsService
@@ -35,41 +35,45 @@ async def cmd_stats(message: Message, state: FSMContext, lang: str, loc: Localiz
     if not message.from_user:
         return
 
-    async for session in get_session():
-        try:
-            stats_service = StatisticsService(session)
-            user_service = UserService(session)
+    session = await get_db_session()
+    try:
+        stats_service = StatisticsService(session)
+        user_service = UserService(session)
 
-            db_user = await user_service.get_user_by_telegram_id(message.from_user.id)
-            if not db_user:
-                await message.answer(loc.get("errors.generic", lang))
-                return
-
-            # Check if user has any data
-            has_data = await stats_service.has_any_data(db_user)
-
-            if not has_data:
-                no_data_msg = loc.get("commands.stats.no_data", lang)
-                await message.answer(no_data_msg)
-                logger.info("stats_no_data", telegram_id=message.from_user.id)
-                return
-
-            # Show period selection
-            title = loc.get("commands.stats.title", lang)
-            select_period = loc.get("commands.stats.select_period", lang)
-
-            await message.answer(
-                f"{title}\n\n{select_period}",
-                reply_markup=get_stats_period_keyboard(loc, lang),
-            )
-
-            await state.set_state(StatsStates.waiting_for_period)
-
-            logger.info("stats_command", telegram_id=message.from_user.id)
-
-        except Exception as e:
-            logger.error("stats_command_error", telegram_id=message.from_user.id, error=str(e))
+        db_user = await user_service.get_user_by_telegram_id(message.from_user.id)
+        if not db_user:
             await message.answer(loc.get("errors.generic", lang))
+            return
+
+        # Check if user has any data
+        has_data = await stats_service.has_any_data(db_user)
+
+        if not has_data:
+            no_data_msg = loc.get("commands.stats.no_data", lang)
+            await message.answer(no_data_msg)
+            logger.info("stats_no_data", telegram_id=message.from_user.id)
+            return
+
+        # Show period selection
+        title = loc.get("commands.stats.title", lang)
+        select_period = loc.get("commands.stats.select_period", lang)
+
+        await message.answer(
+            f"{title}\n\n{select_period}",
+            reply_markup=get_stats_period_keyboard(loc, lang),
+        )
+
+        await state.set_state(StatsStates.waiting_for_period)
+
+        logger.info("stats_command", telegram_id=message.from_user.id)
+
+        await session.commit()
+    except Exception as e:
+        await session.rollback()
+        logger.error("stats_command_error", telegram_id=message.from_user.id, error=str(e))
+        await message.answer(loc.get("errors.generic", lang))
+    finally:
+        await session.close()
 
 
 @router.callback_query(StatsStates.waiting_for_period, F.data.startswith("stats_period_"))
@@ -214,65 +218,69 @@ async def handle_format_selection(
     end_date = data.get("end_date")
     date_range = data.get("date_range", "")
 
-    async for session in get_session():
-        try:
-            stats_service = StatisticsService(session)
-            user_service = UserService(session)
+    session = await get_db_session()
+    try:
+        stats_service = StatisticsService(session)
+        user_service = UserService(session)
 
-            db_user = await user_service.get_user_by_telegram_id(callback.from_user.id)
-            if not db_user:
-                await callback.answer(loc.get("errors.generic", lang), show_alert=True)
-                return
+        db_user = await user_service.get_user_by_telegram_id(callback.from_user.id)
+        if not db_user:
+            await callback.answer(loc.get("errors.generic", lang), show_alert=True)
+            return
 
-            # Get statistics
-            stats = await stats_service.get_statistics(db_user, start_date, end_date)
+        # Get statistics
+        stats = await stats_service.get_statistics(db_user, start_date, end_date)
 
-            if stats["total_sessions"] == 0:
-                no_data_msg = loc.get("commands.stats.no_data", lang)
-                await callback.message.edit_text(no_data_msg)
-                await state.clear()
-                await callback.answer()
-                return
-
-            # Prepare export data
-            export_data = await stats_service.prepare_export_data(db_user, start_date, end_date)
-
-            # Generate file
-            if format_type == "csv":
-                file_bytes = CSVExporter.export_to_bytes(export_data)
-                filename = f"sleep_stats_{callback.from_user.id}.csv"
-            else:  # json
-                file_bytes = JSONExporter.export_to_bytes(export_data)
-                filename = f"sleep_stats_{callback.from_user.id}.json"
-
-            # Send file
-            file = BufferedInputFile(file_bytes, filename=filename)
-
-            exported_msg = loc.get(
-                "commands.stats.exported",
-                lang,
-                total_sessions=stats["total_sessions"],
-                avg_duration=stats["avg_duration"],
-                avg_quality=stats["avg_quality"] if stats["avg_quality"] > 0 else "N/A",
-            )
-
-            await callback.message.edit_text(exported_msg)
-            await callback.message.answer_document(file)
-
+        if stats["total_sessions"] == 0:
+            no_data_msg = loc.get("commands.stats.no_data", lang)
+            await callback.message.edit_text(no_data_msg)
             await state.clear()
             await callback.answer()
+            return
 
-            logger.info(
-                "stats_exported",
-                telegram_id=callback.from_user.id,
-                format=format_type,
-                sessions=stats["total_sessions"],
-            )
+        # Prepare export data
+        export_data = await stats_service.prepare_export_data(db_user, start_date, end_date)
 
-        except Exception as e:
-            logger.error("stats_export_error", telegram_id=callback.from_user.id, error=str(e))
-            await callback.answer(loc.get("errors.generic", lang), show_alert=True)
-            await state.clear()
+        # Generate file
+        if format_type == "csv":
+            file_bytes = CSVExporter.export_to_bytes(export_data)
+            filename = f"sleep_stats_{callback.from_user.id}.csv"
+        else:  # json
+            file_bytes = JSONExporter.export_to_bytes(export_data)
+            filename = f"sleep_stats_{callback.from_user.id}.json"
+
+        # Send file
+        file = BufferedInputFile(file_bytes, filename=filename)
+
+        exported_msg = loc.get(
+            "commands.stats.exported",
+            lang,
+            total_sessions=stats["total_sessions"],
+            avg_duration=stats["avg_duration"],
+            avg_quality=stats["avg_quality"] if stats["avg_quality"] > 0 else "N/A",
+        )
+
+        await callback.message.edit_text(exported_msg)
+        await callback.message.answer_document(file)
+
+        await state.clear()
+        await callback.answer()
+
+        logger.info(
+            "stats_exported",
+            telegram_id=callback.from_user.id,
+            format=format_type,
+            sessions=stats["total_sessions"],
+        )
+
+        await session.commit()
+    except Exception as e:
+        await session.rollback()
+        logger.error("stats_export_error", telegram_id=callback.from_user.id, error=str(e))
+        await callback.answer(loc.get("errors.generic", lang), show_alert=True)
+        await state.clear()
+    finally:
+        await session.close()
 
 
 @router.callback_query(F.data == "stats_back")

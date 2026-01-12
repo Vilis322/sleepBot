@@ -3,7 +3,7 @@ from typing import Any, Awaitable, Callable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import Message, CallbackQuery
 
-from database import get_session
+from database import get_db_session
 from localization import localization
 from services.user_service import UserService
 from utils.logger import get_logger
@@ -39,34 +39,35 @@ class LocalizationMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         # Get user's language from database
-        async for session in get_session():
-            try:
-                user_service = UserService(session)
-                db_user = await user_service.get_user_by_telegram_id(user.id)
+        session = await get_db_session()
+        try:
+            user_service = UserService(session)
+            db_user = await user_service.get_user_by_telegram_id(user.id)
 
-                if db_user:
-                    lang = db_user.language_code
-                else:
-                    # New user - use Telegram's language or default to English
-                    lang = user.language_code if user.language_code in ["en", "ru", "et"] else "en"
+            if db_user:
+                lang = db_user.language_code
+            else:
+                # New user - use Telegram's language or default to English
+                lang = user.language_code if user.language_code in ["en", "ru", "et"] else "en"
 
-                data["lang"] = lang
-                data["loc"] = localization
+            data["lang"] = lang
+            data["loc"] = localization
 
-                logger.debug(
-                    "localization_middleware",
-                    telegram_id=user.id,
-                    language=lang,
-                )
+            logger.debug(
+                "localization_middleware",
+                telegram_id=user.id,
+                language=lang,
+            )
+        except Exception as e:
+            logger.error(
+                "localization_middleware_error",
+                telegram_id=user.id,
+                error=str(e),
+            )
+            # Fallback to English on error
+            data["lang"] = "en"
+            data["loc"] = localization
+        finally:
+            await session.close()
 
-                return await handler(event, data)
-            except Exception as e:
-                logger.error(
-                    "localization_middleware_error",
-                    telegram_id=user.id,
-                    error=str(e),
-                )
-                # Fallback to English on error
-                data["lang"] = "en"
-                data["loc"] = localization
-                return await handler(event, data)
+        return await handler(event, data)

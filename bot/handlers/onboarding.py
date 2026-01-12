@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from bot.states.onboarding import OnboardingStates
-from database import get_session
+from database import get_db_session
 from localization import LocalizationService
 from services.user_service import UserService
 from utils.logger import get_logger
@@ -145,37 +145,41 @@ async def process_timezone(message: Message, state: FSMContext, lang: str, loc: 
     target_hours = data.get("target_hours")
 
     # Complete onboarding
-    async for session in get_session():
-        try:
-            user_service = UserService(session)
-            db_user = await user_service.get_user_by_telegram_id(message.from_user.id)
+    session = await get_db_session()
+    try:
+        user_service = UserService(session)
+        db_user = await user_service.get_user_by_telegram_id(message.from_user.id)
 
-            if db_user:
-                # Update timezone
-                await user_service.update_timezone(db_user, timezone_str)
+        if db_user:
+            # Update timezone
+            await user_service.update_timezone(db_user, timezone_str)
 
-                # Complete onboarding with goals
-                await user_service.complete_onboarding(
-                    db_user,
-                    target_bedtime=bedtime,
-                    target_wake_time=waketime,
-                    target_sleep_hours=target_hours,
-                )
+            # Complete onboarding with goals
+            await user_service.complete_onboarding(
+                db_user,
+                target_bedtime=bedtime,
+                target_wake_time=waketime,
+                target_sleep_hours=target_hours,
+            )
 
-                # Clear state
-                await state.clear()
-
-                # Send completion message
-                completion_msg = loc.get("commands.start.onboarding.completed", lang)
-                await message.answer(completion_msg)
-
-                logger.info(
-                    "onboarding_completed",
-                    telegram_id=message.from_user.id,
-                    timezone=timezone_str,
-                )
-
-        except Exception as e:
-            logger.error("onboarding_completion_error", telegram_id=message.from_user.id, error=str(e))
-            await message.answer(loc.get("errors.generic", lang))
+            # Clear state
             await state.clear()
+
+            # Send completion message
+            completion_msg = loc.get("commands.start.onboarding.completed", lang)
+            await message.answer(completion_msg)
+
+            logger.info(
+                "onboarding_completed",
+                telegram_id=message.from_user.id,
+                timezone=timezone_str,
+            )
+
+        await session.commit()
+    except Exception as e:
+        await session.rollback()
+        logger.error("onboarding_completion_error", telegram_id=message.from_user.id, error=str(e))
+        await message.answer(loc.get("errors.generic", lang))
+        await state.clear()
+    finally:
+        await session.close()

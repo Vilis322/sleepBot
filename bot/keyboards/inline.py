@@ -37,31 +37,39 @@ def get_sleep_conflict_keyboard(duration_hours: int, duration_minutes: int) -> I
     return builder.as_markup()
 
 
-def get_stats_period_keyboard() -> InlineKeyboardMarkup:
+def get_stats_period_keyboard(loc, lang: str) -> InlineKeyboardMarkup:
     """Get keyboard for statistics period selection.
+
+    Args:
+        loc: Localization service
+        lang: Language code
 
     Returns:
         Keyboard with period options
     """
     builder = InlineKeyboardBuilder()
-    builder.button(text="📅 Last 7 days", callback_data="stats_period_week")
-    builder.button(text="📅 Last 30 days", callback_data="stats_period_month")
-    builder.button(text="📅 All time", callback_data="stats_period_all")
-    builder.button(text="📅 Custom range", callback_data="stats_period_custom")
+    builder.button(text=loc.get("commands.stats.period_week", lang), callback_data="stats_period_week")
+    builder.button(text=loc.get("commands.stats.period_month", lang), callback_data="stats_period_month")
+    builder.button(text=loc.get("commands.stats.period_all", lang), callback_data="stats_period_all")
+    builder.button(text=loc.get("commands.stats.period_custom", lang), callback_data="stats_period_custom")
     builder.adjust(1)
     return builder.as_markup()
 
 
-def get_stats_format_keyboard() -> InlineKeyboardMarkup:
+def get_stats_format_keyboard(loc, lang: str) -> InlineKeyboardMarkup:
     """Get keyboard for export format selection.
+
+    Args:
+        loc: Localization service
+        lang: Language code
 
     Returns:
         Keyboard with format options
     """
     builder = InlineKeyboardBuilder()
-    builder.button(text="📄 CSV", callback_data="stats_format_csv")
-    builder.button(text="📄 JSON", callback_data="stats_format_json")
-    builder.button(text="⬅️ Back", callback_data="stats_back")
+    builder.button(text=loc.get("commands.stats.format_csv", lang), callback_data="stats_format_csv")
+    builder.button(text=loc.get("commands.stats.format_json", lang), callback_data="stats_format_json")
+    builder.button(text=loc.get("buttons.back", lang), callback_data="stats_back")
     builder.adjust(2, 1)  # 2 buttons in first row, 1 in second
     return builder.as_markup()
 

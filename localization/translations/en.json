@@ -17,7 +17,7 @@
     },
     "help": {
       "title": "📚 Available Commands",
-      "commands_list": "/start - Initialize bot and configure preferences\n/help - Show this help message\n/language - Change interface language\n/sleep - Start sleep tracking\n/wake - Stop tracking and view statistics\n/quality <rating> - Rate your sleep quality (1-10)\n/note <text> - Add notes about your sleep\n/stats - View and export your sleep statistics"
+      "commands_list": "/start - Initialize bot and configure preferences\n/help - Show this help message\n/language - Change interface language\n/sleep - Start sleep tracking\n/wake - Stop tracking and view statistics\n/quality &lt;rating&gt; - Rate your sleep quality (1-10)\n/note &lt;text&gt; - Add notes about your sleep\n/stats - View and export your sleep statistics"
     },
     "language": {
       "select": "🌍 Select your language:",
@@ -34,7 +34,7 @@
     },
     "wake": {
       "no_active_session": "⚠️ You don't have an active sleep session.\n\nUse /sleep to start tracking your sleep.",
-      "completed": "☀️ Good morning!\n\n📊 <b>Sleep Statistics:</b>\n⏰ Sleep time: {sleep_time}\n⏰ Wake time: {wake_time}\n⏱ Duration: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 You can:\n• Rate quality: /quality <1-10>\n• Add notes: /note <your notes>",
+      "completed": "☀️ Good morning!\n\n📊 <b>Sleep Statistics:</b>\n⏰ Sleep time: {sleep_time}\n⏰ Wake time: {wake_time}\n⏱ Duration: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 You can:\n• Rate quality: /quality &lt;1-10&gt;\n• Add notes: /note &lt;your notes&gt;",
       "goal_met": "🎯 You slept {duration}h {minutes}m, that's {percentage}% of your goal ({target_hours}h)! Great job!",
       "goal_not_met": "📉 You slept {duration}h {minutes}m, that's {percentage}% of your goal ({target_hours}h). Try to sleep more tonight!",
       "no_goal": "Set your sleep goals with /start to get personalized insights."
@@ -42,7 +42,7 @@
     "quality": {
       "no_last_session": "⚠️ No sleep session found.\n\nComplete a sleep session first with /sleep and /wake",
       "already_rated": "⚠️ You already rated this session with {rating}/10.\n\nDo you want to update it?",
-      "invalid_format": "⚠️ Invalid format. Please use: /quality <number>\n\nExample: /quality 8 or /quality 7.5",
+      "invalid_format": "⚠️ Invalid format. Please use: /quality &lt;number&gt;\n\nExample: /quality 8 or /quality 7.5",
       "invalid_range": "⚠️ Rating must be between 1 and 10.\n\nExample: /quality 8",
       "saved": "✅ Sleep quality rated: {rating}/10\n\nThank you for your feedback!"
     },

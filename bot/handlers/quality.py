@@ -33,7 +33,9 @@ async def cmd_quality(message: Message, lang: str, loc: LocalizationService) -> 
         return
 
     try:
-        rating = float(parts[1])
+        # Support both comma and dot as decimal separator
+        rating_str = parts[1].replace(',', '.')
+        rating = float(rating_str)
     except ValueError:
         error_msg = loc.get("commands.quality.invalid_format", lang)
         await message.answer(error_msg)
@@ -88,8 +90,8 @@ async def cmd_quality(message: Message, lang: str, loc: LocalizationService) -> 
             )
 
         except ValueError as e:
-            logger.error("quality_validation_error", telegram_id=message.from_user.id, error=str(e))
+            logger.error("quality_error", telegram_id=message.from_user.id, error=str(e))
             await message.answer(loc.get("commands.quality.invalid_range", lang))
         except Exception as e:
-            logger.error("quality_command_error", telegram_id=message.from_user.id, error=str(e))
+            logger.error("quality_error", telegram_id=message.from_user.id, error=str(e))
             await message.answer(loc.get("errors.generic", lang))

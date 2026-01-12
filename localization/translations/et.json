@@ -17,7 +17,7 @@
     },
     "help": {
       "title": "📚 Saadaolevad käsud",
-      "commands_list": "/start - Käivitage bot ja konfigureerige eelistused\n/help - Kuva see abiteade\n/language - Muuda liidese keelt\n/sleep - Alusta une jälgimist\n/wake - Lõpeta jälgimine ja vaata statistikat\n/quality <hinnang> - Hinda oma une kvaliteeti (1-10)\n/note <tekst> - Lisa oma une kohta märkmeid\n/stats - Vaata ja ekspordi oma une statistikat"
+      "commands_list": "/start - Käivitage bot ja konfigureerige eelistused\n/help - Kuva see abiteade\n/language - Muuda liidese keelt\n/sleep - Alusta une jälgimist\n/wake - Lõpeta jälgimine ja vaata statistikat\n/quality &lt;hinnang&gt; - Hinda oma une kvaliteeti (1-10)\n/note &lt;tekst&gt; - Lisa oma une kohta märkmeid\n/stats - Vaata ja ekspordi oma une statistikat"
     },
     "language": {
       "select": "🌍 Valige oma keel:",
@@ -34,7 +34,7 @@
     },
     "wake": {
       "no_active_session": "⚠️ Teil ei ole aktiivset uneseanssi.\n\nKasutage /sleep, et alustada oma une jälgimist.",
-      "completed": "☀️ Tere hommikust!\n\n📊 <b>Une statistika:</b>\n⏰ Magamamineku aeg: {sleep_time}\n⏰ Ärkamise aeg: {wake_time}\n⏱ Kestus: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 Saate:\n• Hinnata kvaliteeti: /quality <1-10>\n• Lisada märkmeid: /note <teie märkmed>",
+      "completed": "☀️ Tere hommikust!\n\n📊 <b>Une statistika:</b>\n⏰ Magamamineku aeg: {sleep_time}\n⏰ Ärkamise aeg: {wake_time}\n⏱ Kestus: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 Saate:\n• Hinnata kvaliteeti: /quality &lt;1-10&gt;\n• Lisada märkmeid: /note &lt;teie märkmed&gt;",
       "goal_met": "🎯 Te magasite {duration}h {minutes}m, see on {percentage}% teie eesmärgist ({target_hours}h)! Suurepärane töö!",
       "goal_not_met": "📉 Te magasite {duration}h {minutes}m, see on {percentage}% teie eesmärgist ({target_hours}h). Proovige täna õhtul rohkem magada!",
       "no_goal": "Seadke oma une eesmärgid käsuga /start, et saada isikupärastatud soovitusi."
@@ -42,7 +42,7 @@
     "quality": {
       "no_last_session": "⚠️ Uneseanssi ei leitud.\n\nLõpetage kõigepealt uneseanss käskudega /sleep ja /wake",
       "already_rated": "⚠️ Olete selle seanssi juba hinnanud {rating}/10.\n\nKas soovite hinnangut uuendada?",
-      "invalid_format": "⚠️ Vigane formaat. Palun kasutage: /quality <number>\n\nNäide: /quality 8 või /quality 7.5",
+      "invalid_format": "⚠️ Vigane formaat. Palun kasutage: /quality &lt;number&gt;\n\nNäide: /quality 8 või /quality 7.5",
       "invalid_range": "⚠️ Hinnang peab olema vahemikus 1 kuni 10.\n\nNäide: /quality 8",
       "saved": "✅ Une kvaliteet hinnatud: {rating}/10\n\nTäname tagasiside eest!"
     },

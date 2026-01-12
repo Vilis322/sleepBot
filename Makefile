@@ -56,9 +56,14 @@ venv-install:  ## Install dependencies in venv (run after activating venv)
 		echo "   make venv-install"; \
 		exit 1; \
 	fi
-	@echo "📦 Installing dependencies in virtual environment..."
+	@echo "📦 Installing dependencies from pyproject.toml..."
 	pip install --upgrade pip setuptools wheel
-	pip install -e ".[dev]"
+	@echo ""
+	@echo "📦 Reading dependencies from pyproject.toml..."
+	@python3 -c "import tomllib; f = open('pyproject.toml', 'rb'); data = tomllib.load(f); deps = data['project']['dependencies']; print(' '.join(deps))" | xargs pip install
+	@echo ""
+	@echo "📦 Installing dev dependencies..."
+	@python3 -c "import tomllib; f = open('pyproject.toml', 'rb'); data = tomllib.load(f); deps = data['project']['optional-dependencies']['dev']; print(' '.join(deps))" | xargs pip install
 	@echo ""
 	@echo "✅ Dependencies installed in venv!"
 	@echo "🐍 Python: $$(python --version)"
@@ -78,11 +83,12 @@ venv-remove:  ## Remove virtual environment
 		echo "ℹ️  No virtual environment found"; \
 	fi
 
-install:  ## Install production dependencies
-	pip3 install -e .
-
-install-dev:  ## Install all dependencies including dev tools
-	pip3 install -e ".[dev]"
+# Deprecated: Use venv-install instead
+# install:  ## Install production dependencies
+# 	pip3 install -e .
+#
+# install-dev:  ## Install all dependencies including dev tools
+# 	pip3 install -e ".[dev]"
 
 db-up:  ## Start PostgreSQL container
 	docker-compose up -d
@@ -90,13 +96,17 @@ db-up:  ## Start PostgreSQL container
 db-down:  ## Stop PostgreSQL container
 	docker-compose down
 
-db-init:  ## Initialize database (create tables)
-	alembic upgrade head
+db-clean:  ## Stop and remove PostgreSQL container and volumes (WARNING: deletes all data!)
+	@echo "⚠️  WARNING: This will delete ALL database data!"
+	@echo "Press Ctrl+C to cancel, or Enter to continue..."
+	@read confirm
+	docker-compose down -v
+	@echo "✅ Database cleaned. Run 'make db-up' to start fresh"
 
 db-migrate:  ## Create new migration (use: make db-migrate msg="your message")
 	alembic revision --autogenerate -m "$(msg)"
 
-db-upgrade:  ## Apply all pending migrations
+db-upgrade:  ## Apply all pending migrations (also works for initial setup)
 	alembic upgrade head
 
 db-downgrade:  ## Rollback last migration
@@ -108,14 +118,14 @@ db-current:  ## Show current migration version
 db-history:  ## Show migration history
 	alembic history --verbose
 
-db-reset:  ## Reset database (downgrade to base and upgrade to head)
+db-reset:  ## Reset database (WARNING: deletes all data!)
+	@echo "⚠️  WARNING: This will delete ALL data in the database!"
+	@echo "Press Ctrl+C to cancel, or Enter to continue..."
+	@read confirm
 	alembic downgrade base
 	alembic upgrade head
 
 run:  ## Run the bot
-	python3 main.py
-
-dev:  ## Run bot in development mode with auto-reload
 	python3 main.py
 
 test:  ## Run all tests with coverage
@@ -139,8 +149,8 @@ format:  ## Format code with black
 	black .
 
 lint:  ## Run linters (flake8, mypy)
-	flake8 . --exclude=venv,alembic
-	mypy . --exclude=venv --exclude=alembic
+	flake8 . --exclude=.venv,alembic
+	mypy . --exclude=.venv --exclude=alembic
 
 clean:  ## Clean up generated files
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
@@ -167,19 +177,18 @@ setup-venv:  ## Complete setup with virtual environment (RECOMMENDED)
 	@echo "Or use the script below (copy-paste):"
 	@echo "source .venv/bin/activate && make venv-install && make db-up && sleep 5 && make db-migrate msg=\"Initial migration\" && make db-upgrade"
 
-setup:  ## Complete local setup (install deps, start db, run migrations)
-	@echo "📦 Installing dependencies..."
-	make install-dev
-	@echo "🐘 Starting PostgreSQL..."
-	make db-up
-	@echo "⏳ Waiting for database to be ready..."
-	sleep 3
-	@echo "🗄️  Running migrations..."
-	make db-init
-	@echo "✅ Setup complete! Copy .env.example to .env and fill in your credentials"
-	@echo "Then run: make run"
-
-setup-quick: install-dev db-up db-init  ## Quick setup (all in one command)
+# Deprecated: Use setup-venv instead for new projects
+# setup:  ## Complete local setup (install deps, start db, run migrations)
+# 	@echo "📦 Installing dependencies..."
+# 	make install-dev
+# 	@echo "🐘 Starting PostgreSQL..."
+# 	make db-up
+# 	@echo "⏳ Waiting for database to be ready..."
+# 	sleep 3
+# 	@echo "🗄️  Running migrations..."
+# 	make db-upgrade
+# 	@echo "✅ Setup complete! Copy .env.example to .env and fill in your credentials"
+# 	@echo "Then run: make run"
 
 logs:  ## Show docker-compose logs
 	docker-compose logs -f

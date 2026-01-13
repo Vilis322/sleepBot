@@ -100,7 +100,7 @@ async def handle_period_selection(
     if period == "custom":
         # Show calendar for start date selection
         date_from_msg = loc.get("commands.stats.custom_date_from", lang)
-        calendar = SimpleCalendar(locale=get_user_locale(lang))
+        calendar = SimpleCalendar(locale=await get_user_locale(callback.from_user))
         await callback.message.edit_text(
             date_from_msg,
             reply_markup=await calendar.start_calendar()
@@ -147,7 +147,7 @@ async def handle_start_date_selection(
         lang: User's language code
         loc: Localization service
     """
-    calendar = SimpleCalendar(locale=get_user_locale(lang))
+    calendar = SimpleCalendar(locale=await get_user_locale(callback.from_user))
     selected, date = await calendar.process_selection(callback, callback_data)
 
     if selected:
@@ -174,7 +174,7 @@ async def handle_end_date_selection(
         lang: User's language code
         loc: Localization service
     """
-    calendar = SimpleCalendar(locale=get_user_locale(lang))
+    calendar = SimpleCalendar(locale=await get_user_locale(callback.from_user))
     selected, date = await calendar.process_selection(callback, callback_data)
 
     if selected:

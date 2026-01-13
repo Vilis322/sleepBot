@@ -44,12 +44,6 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=.",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-    "--cov-exclude=tests/",
-    "--cov-exclude=alembic/",
 ]
 
 [tool.coverage.run]

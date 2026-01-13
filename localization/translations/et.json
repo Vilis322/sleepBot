@@ -72,7 +72,8 @@
       "custom_date_from": "Sisestage alguskuupäev (YYYY-MM-DD):",
       "custom_date_to": "Sisestage lõppkuupäev (YYYY-MM-DD):",
       "invalid_date": "⚠️ Vigane kuupäeva formaat. Palun kasutage YYYY-MM-DD formaati (nt 2026-01-01)",
-      "date_out_of_range": "⚠️ Kuupäev on väljaspool teie jälgimisperioodi.\n\nAlustasite boti kasutamist kuupäeval {first_date}"
+      "date_out_of_range": "⚠️ Kuupäev on väljaspool teie jälgimisperioodi.\n\nAlustasite boti kasutamist kuupäeval {first_date}",
+      "custom_date_cancelled": "❌ Kohandatud kuupäeva valimine tühistatud.\n\nKasutage /stats uuesti alustamiseks."
     }
   },
   "errors": {

@@ -78,7 +78,8 @@
       "custom_date_from": "Enter start date (YYYY-MM-DD):",
       "custom_date_to": "Enter end date (YYYY-MM-DD):",
       "invalid_date": "⚠️ Invalid date format. Please use YYYY-MM-DD format (e.g., 2026-01-01)",
-      "date_out_of_range": "⚠️ Date is outside your tracking period.\n\nYou started using the bot on {first_date}"
+      "date_out_of_range": "⚠️ Date is outside your tracking period.\n\nYou started using the bot on {first_date}",
+      "custom_date_cancelled": "❌ Custom date selection cancelled.\n\nUse /stats to start over."
     }
   },
   "errors": {

@@ -125,7 +125,7 @@ async def handle_period_selection(
         date_range = loc.get("commands.stats.period_all", lang)
 
     # Save to state
-    await state.update_data(start_date=start_date, end_date=end_date, date_range=date_range)
+    await state.update_data(start_date=start_date, end_date=end_date, date_range=date_range, period_type=period)
 
     # Show format selection
     select_format = loc.get("commands.stats.select_format", lang)
@@ -159,6 +159,12 @@ async def handle_start_date_selection(
             reply_markup=await calendar.start_calendar(year=date.year, month=date.month)
         )
         await state.set_state(StatsStates.waiting_for_custom_date_to)
+    elif selected is False:
+        # User cancelled date selection
+        cancel_msg = loc.get("commands.stats.custom_date_cancelled", lang)
+        await callback.message.edit_text(cancel_msg)
+        await state.clear()
+        await callback.answer()
 
 
 @router.callback_query(StatsStates.waiting_for_custom_date_to, SimpleCalendarCallback.filter())
@@ -192,11 +198,17 @@ async def handle_end_date_selection(
         start_date = start_date.replace(hour=0, minute=0, second=0)
         date_range = f"{start_date.strftime('%Y-%m-%d')} - {end_date.strftime('%Y-%m-%d')}"
 
-        await state.update_data(start_date=start_date, end_date=end_date, date_range=date_range)
+        await state.update_data(start_date=start_date, end_date=end_date, date_range=date_range, period_type="custom")
 
         select_format = loc.get("commands.stats.select_format", lang)
         await callback.message.edit_text(select_format, reply_markup=get_stats_format_keyboard(loc, lang))
         await state.set_state(StatsStates.waiting_for_format)
+    elif selected is False:
+        # User cancelled date selection
+        cancel_msg = loc.get("commands.stats.custom_date_cancelled", lang)
+        await callback.message.edit_text(cancel_msg)
+        await state.clear()
+        await callback.answer()
 
 
 @router.callback_query(StatsStates.waiting_for_format, F.data.startswith("stats_format_"))
@@ -221,6 +233,7 @@ async def handle_format_selection(
     start_date = data.get("start_date")
     end_date = data.get("end_date")
     date_range = data.get("date_range", "")
+    period_type = data.get("period_type", "all")
 
     async for session in get_session():
         try:
@@ -249,13 +262,25 @@ async def handle_format_selection(
             # Prepare export data
             export_data = await stats_service.prepare_export_data(db_user, start_date, end_date)
 
+            # Generate filename based on period type
+            today = datetime.now().strftime("%Y-%m-%d")
+            if period_type == "custom" and start_date and end_date:
+                # Custom range: use actual dates
+                filename_base = f"sleep_stats_{start_date.strftime('%Y-%m-%d')}_to_{end_date.strftime('%Y-%m-%d')}"
+            elif period_type == "week":
+                filename_base = f"sleep_stats_week_{today}"
+            elif period_type == "month":
+                filename_base = f"sleep_stats_month_{today}"
+            else:  # all time
+                filename_base = f"sleep_stats_all_time_{today}"
+
             # Generate file
             if format_type == "csv":
                 file_bytes = CSVExporter.export_to_bytes(export_data)
-                filename = f"sleep_stats_{callback.from_user.id}.csv"
+                filename = f"{filename_base}.csv"
             else:  # json
                 file_bytes = JSONExporter.export_to_bytes(export_data)
-                filename = f"sleep_stats_{callback.from_user.id}.json"
+                filename = f"{filename_base}.json"
 
             # Send file
             file = BufferedInputFile(file_bytes, filename=filename)

@@ -63,8 +63,12 @@ async def cmd_note(message: Message, lang: str, loc: LocalizationService) -> Non
             # Add/update note
             await sleep_service.add_note(last_session, note_text)
 
+            # Choose message based on whether this is an update and if quality rating exists
             if has_existing_note:
                 success_msg = loc.get("commands.note.updated", lang, note=note_text)
+            elif last_session.quality_rating is None:
+                # New note and no quality rating - suggest adding quality
+                success_msg = loc.get("commands.note.saved_suggest_quality", lang, note=note_text)
             else:
                 success_msg = loc.get("commands.note.saved", lang, note=note_text)
 

@@ -83,7 +83,12 @@ async def cmd_quality(message: Message, lang: str, loc: LocalizationService) -> 
             # Add/update rating
             await sleep_service.add_quality_rating(last_session, rating)
 
-            success_msg = loc.get("commands.quality.saved", lang, rating=rating)
+            # Check if note exists, suggest adding one if not
+            if last_session.note is None:
+                success_msg = loc.get("commands.quality.saved_suggest_note", lang, rating=rating)
+            else:
+                success_msg = loc.get("commands.quality.saved", lang, rating=rating)
+
             await message.answer(success_msg)
 
             logger.info(

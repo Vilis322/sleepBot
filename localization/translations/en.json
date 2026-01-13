@@ -34,7 +34,7 @@
     },
     "wake": {
       "no_active_session": "⚠️ You don't have an active sleep session.\n\nUse /sleep to start tracking your sleep.",
-      "completed": "☀️ Good morning!\n\n📊 <b>Sleep Statistics:</b>\n⏰ Sleep time: {sleep_time}\n⏰ Wake time: {wake_time}\n⏱ Duration: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 You can:\n• Rate quality: /quality &lt;1-10&gt;\n• Add notes: /note &lt;your notes&gt;",
+      "completed": "☀️ Good morning!\n\n📊 <b>Sleep Statistics:</b>\n⏰ Sleep time: {sleep_time}\n⏰ Wake time: {wake_time}\n⏱ Duration: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 You can:\n• Rate quality: quality &lt;1-10&gt;\n  Example: quality 8 or quality 7.5\n• Add notes: note &lt;your notes&gt;\n  Example: note Slept well, woke up refreshed",
       "goal_met": "🎯 You slept {duration}h {minutes}m, that's {percentage}% of your goal ({target_hours}h)! Great job!",
       "goal_not_met": "📉 You slept {duration}h {minutes}m, that's {percentage}% of your goal ({target_hours}h). Try to sleep more tonight!",
       "no_goal": "Set your sleep goals with /start to get personalized insights."
@@ -42,15 +42,17 @@
     "quality": {
       "no_last_session": "⚠️ No sleep session found.\n\nComplete a sleep session first with /sleep and /wake",
       "already_rated": "⚠️ You already rated this session with {rating}/10.\n\nDo you want to update it?",
-      "invalid_format": "⚠️ Invalid format. Please use: /quality &lt;number&gt;\n\nExample: /quality 8 or /quality 7.5",
+      "invalid_format": "⚠️ Please provide a number.\n\nExample: /quality 8 or /quality 7.5",
       "invalid_range": "⚠️ Rating must be between 1 and 10.\n\nExample: /quality 8",
-      "saved": "✅ Sleep quality rated: {rating}/10\n\nThank you for your feedback!"
+      "saved": "✅ Sleep quality rated: {rating}/10\n\nThank you for your feedback!",
+      "saved_suggest_note": "✅ Sleep quality rated: {rating}/10\n\nThank you for your feedback!\n\n💡 You can also add notes about your sleep:\nExample: /note Slept well, woke up refreshed"
     },
     "note": {
       "no_last_session": "⚠️ No sleep session found.\n\nComplete a sleep session first with /sleep and /wake",
       "empty": "⚠️ Please provide a note.\n\nExample: /note Had trouble falling asleep",
       "saved": "✅ Note saved for your last sleep session:\n\n\"{note}\"",
-      "updated": "✅ Note updated for your last sleep session:\n\n\"{note}\""
+      "updated": "✅ Note updated for your last sleep session:\n\n\"{note}\"",
+      "saved_suggest_quality": "✅ Note saved for your last sleep session:\n\n\"{note}\"\n\n💡 You can also rate your sleep quality:\nExample: /quality 8 or /quality 7.5"
     },
     "stats": {
       "title": "📊 Sleep Statistics",

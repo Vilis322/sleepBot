@@ -34,7 +34,7 @@
     },
     "wake": {
       "no_active_session": "⚠️ Teil ei ole aktiivset uneseanssi.\n\nKasutage /sleep, et alustada oma une jälgimist.",
-      "completed": "☀️ Tere hommikust!\n\n📊 <b>Une statistika:</b>\n⏰ Magamamineku aeg: {sleep_time}\n⏰ Ärkamise aeg: {wake_time}\n⏱ Kestus: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 Saate:\n• Hinnata kvaliteeti: /quality &lt;1-10&gt;\n• Lisada märkmeid: /note &lt;teie märkmed&gt;",
+      "completed": "☀️ Tere hommikust!\n\n📊 <b>Une statistika:</b>\n⏰ Magamamineku aeg: {sleep_time}\n⏰ Ärkamise aeg: {wake_time}\n⏱ Kestus: {duration}h {minutes}m\n\n{goal_comparison}\n\n💡 Saate:\n• Hinnata kvaliteeti: quality &lt;1-10&gt;\n  Näide: quality 8 või quality 7.5\n• Lisada märkmeid: note &lt;teie märkmed&gt;\n  Näide: note Magasin hästi, ärkasin värskelt",
       "goal_met": "🎯 Te magasite {duration}h {minutes}m, see on {percentage}% teie eesmärgist ({target_hours}h)! Suurepärane töö!",
       "goal_not_met": "📉 Te magasite {duration}h {minutes}m, see on {percentage}% teie eesmärgist ({target_hours}h). Proovige täna õhtul rohkem magada!",
       "no_goal": "Seadke oma une eesmärgid käsuga /start, et saada isikupärastatud soovitusi."
@@ -42,15 +42,17 @@
     "quality": {
       "no_last_session": "⚠️ Uneseanssi ei leitud.\n\nLõpetage kõigepealt uneseanss käskudega /sleep ja /wake",
       "already_rated": "⚠️ Olete selle seanssi juba hinnanud {rating}/10.\n\nKas soovite hinnangut uuendada?",
-      "invalid_format": "⚠️ Vigane formaat. Palun kasutage: /quality &lt;number&gt;\n\nNäide: /quality 8 või /quality 7.5",
+      "invalid_format": "⚠️ Palun esitage number.\n\nNäide: /quality 8 või /quality 7.5",
       "invalid_range": "⚠️ Hinnang peab olema vahemikus 1 kuni 10.\n\nNäide: /quality 8",
-      "saved": "✅ Une kvaliteet hinnatud: {rating}/10\n\nTäname tagasiside eest!"
+      "saved": "✅ Une kvaliteet hinnatud: {rating}/10\n\nTäname tagasiside eest!",
+      "saved_suggest_note": "✅ Une kvaliteet hinnatud: {rating}/10\n\nTäname tagasiside eest!\n\n💡 Saate lisada ka märkmeid oma une kohta:\nNäide: /note Magasin hästi, ärkasin värskelt"
     },
     "note": {
       "no_last_session": "⚠️ Uneseanssi ei leitud.\n\nLõpetage kõigepealt uneseanss käskudega /sleep ja /wake",
       "empty": "⚠️ Palun esitage märkus.\n\nNäide: /note Mul oli raske magama jääda",
       "saved": "✅ Märkus salvestatud teie viimase uneseanssi jaoks:\n\n\"{note}\"",
-      "updated": "✅ Märkus uuendatud teie viimase uneseanssi jaoks:\n\n\"{note}\""
+      "updated": "✅ Märkus uuendatud teie viimase uneseanssi jaoks:\n\n\"{note}\"",
+      "saved_suggest_quality": "✅ Märkus salvestatud teie viimase uneseanssi jaoks:\n\n\"{note}\"\n\n💡 Saate hinnata ka oma une kvaliteeti:\nNäide: /quality 8 või /quality 7.5"
     },
     "stats": {
       "title": "📊 Une statistika",

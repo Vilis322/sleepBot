@@ -103,3 +103,59 @@ def get_back_button(callback_data: str = "back") -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text="⬅️ Back", callback_data=callback_data)
     return builder.as_markup()
+
+
+def get_quality_rating_keyboard() -> InlineKeyboardMarkup:
+    """Get keyboard for sleep quality rating selection (1-10).
+
+    Returns:
+        Keyboard with rating buttons 1-10
+    """
+    builder = InlineKeyboardBuilder()
+
+    # Add buttons 1-10
+    for rating in range(1, 11):
+        builder.button(text=str(rating), callback_data=f"quality_rate_{rating}")
+
+    # Arrange in 2 rows of 5 buttons each
+    builder.adjust(5, 5)
+    return builder.as_markup()
+
+
+def get_quality_confirmation_keyboard(rating: float, loc, lang: str) -> InlineKeyboardMarkup:
+    """Get confirmation keyboard for quality rating update.
+
+    Args:
+        rating: Rating value to confirm
+        loc: Localization service
+        lang: Language code
+
+    Returns:
+        Keyboard with confirm/cancel buttons
+    """
+    builder = InlineKeyboardBuilder()
+    confirm_text = loc.get("buttons.confirm", lang)
+    cancel_text = loc.get("buttons.cancel", lang)
+    builder.button(text=confirm_text, callback_data=f"quality_confirm_{rating}")
+    builder.button(text=cancel_text, callback_data="quality_cancel")
+    builder.adjust(2)
+    return builder.as_markup()
+
+
+def get_note_confirmation_keyboard(loc, lang: str) -> InlineKeyboardMarkup:
+    """Get confirmation keyboard for note update.
+
+    Args:
+        loc: Localization service
+        lang: Language code
+
+    Returns:
+        Keyboard with confirm/cancel buttons
+    """
+    builder = InlineKeyboardBuilder()
+    confirm_text = loc.get("buttons.confirm", lang)
+    cancel_text = loc.get("buttons.cancel", lang)
+    builder.button(text=confirm_text, callback_data="note_confirm")
+    builder.button(text=cancel_text, callback_data="note_cancel")
+    builder.adjust(2)
+    return builder.as_markup()

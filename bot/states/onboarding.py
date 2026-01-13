@@ -18,3 +18,16 @@ class StatsStates(StatesGroup):
     waiting_for_format = State()
     waiting_for_custom_date_from = State()
     waiting_for_custom_date_to = State()
+
+
+class NoteStates(StatesGroup):
+    """FSM states for note input process."""
+
+    waiting_for_note_text = State()
+    waiting_for_note_confirmation = State()
+
+
+class QualityStates(StatesGroup):
+    """FSM states for quality rating confirmation."""
+
+    waiting_for_confirmation = State()

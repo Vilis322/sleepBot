@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 
 import pytz
@@ -10,6 +11,13 @@ from repositories.sleep_repository import SleepRepository
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+class SessionUpdateValidation(Enum):
+    """Result of session update validation."""
+    ALLOW = "allow"  # First update, session is fresh
+    ASK_CONFIRMATION = "ask_confirmation"  # Data exists, session is fresh
+    SHOW_WARNING = "show_warning"  # Session is old
 
 
 class SleepService:
@@ -147,6 +155,38 @@ class SleepService:
         """
         return await self.repository.get_last_completed_session(user.id)
 
+    def validate_session_update(
+        self, session: SleepSession, data_type: str, has_existing_data: bool
+    ) -> tuple[SessionUpdateValidation, float]:
+        """Validate if a session update should be allowed.
+
+        Args:
+            session: Sleep session to validate
+            data_type: Type of data being updated ('quality' or 'note')
+            has_existing_data: Whether the session already has this data
+
+        Returns:
+            Tuple of (validation result, hours since wake)
+        """
+        if not session.sleep_end:
+            # Should not happen as we check for completed sessions
+            return SessionUpdateValidation.SHOW_WARNING, 0.0
+
+        now = datetime.now(pytz.UTC)
+        hours_since_wake = (now - session.sleep_end).total_seconds() / 3600
+
+        # Fresh session (< 24 hours)
+        if hours_since_wake < 24:
+            if has_existing_data:
+                # Data exists, ask confirmation
+                return SessionUpdateValidation.ASK_CONFIRMATION, hours_since_wake
+            else:
+                # First time adding data
+                return SessionUpdateValidation.ALLOW, hours_since_wake
+
+        # Old session (>= 24 hours)
+        return SessionUpdateValidation.SHOW_WARNING, hours_since_wake
+
     async def add_quality_rating(
         self, session: SleepSession, quality_rating: float
     ) -> SleepSession:
@@ -232,6 +272,25 @@ class SleepService:
         """
         user_time = self._convert_from_utc(dt, user.timezone)
         return user_time.strftime("%H:%M")
+
+    def format_time_ago(self, hours: float) -> str:
+        """Format hours ago into human-readable string.
+
+        Args:
+            hours: Hours ago
+
+        Returns:
+            Formatted string (e.g., "2 days ago", "5 hours ago")
+        """
+        if hours < 1:
+            minutes = int(hours * 60)
+            return f"{minutes} minutes ago"
+        elif hours < 24:
+            h = int(hours)
+            return f"{h} hours ago"
+        else:
+            days = int(hours / 24)
+            return f"{days} days ago"
 
     async def get_sessions_by_date_range(
         self, user: User, start_date: datetime, end_date: datetime

@@ -30,6 +30,7 @@ dev = [
     "pytest-cov==6.0.0",
     "pytest-mock==3.14.0",
     "faker==33.1.0",
+    "aiosqlite==0.22.1",
     "black==24.10.0",
     "flake8==7.1.1",
     "mypy==1.13.0",
@@ -37,6 +38,7 @@ dev = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]

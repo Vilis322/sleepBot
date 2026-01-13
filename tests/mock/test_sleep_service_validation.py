@@ -200,17 +200,25 @@ class TestSleepServiceValidation:
         self, sleep_service: SleepService, test_user_with_sessions: User, async_session
     ):
         """Test that get_last_completed_session returns the most recent completed session."""
+        from sqlalchemy import select
+        from models.sleep_session import SleepSession
+
         last_session = await sleep_service.get_last_completed_session(test_user_with_sessions)
 
         assert last_session is not None
         assert last_session.sleep_end is not None
 
         # Verify it's the most recent completed session (not the active one)
-        all_sessions = await async_session.execute(
-            "SELECT * FROM sleep_sessions WHERE user_id = ? AND sleep_end IS NOT NULL ORDER BY sleep_end DESC",
-            (test_user_with_sessions.id,),
+        result = await async_session.execute(
+            select(SleepSession)
+            .where(SleepSession.user_id == test_user_with_sessions.id)
+            .where(SleepSession.sleep_end.is_not(None))
+            .order_by(SleepSession.sleep_end.desc())
         )
+        all_sessions = list(result.scalars().all())
         # The returned session should be the most recent completed one
+        assert len(all_sessions) > 0
+        assert last_session.id == all_sessions[0].id
 
     @pytest.mark.asyncio
     async def test_get_last_completed_session_no_sessions(

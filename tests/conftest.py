@@ -86,9 +86,9 @@ async def test_user(async_session: AsyncSession) -> User:
     user = User(
         telegram_id=fake.random_int(min=100000, max=999999),
         username=fake.user_name(),
-        language="en",
+        language_code="en",
         timezone="UTC",
-        target_sleep_hours=8.0,
+        target_sleep_hours=8,
         target_bedtime=datetime.now().replace(hour=22, minute=0, second=0, microsecond=0).time(),
         target_wake_time=datetime.now().replace(hour=6, minute=0, second=0, microsecond=0).time(),
     )

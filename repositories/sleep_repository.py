@@ -92,7 +92,18 @@ class SleepRepository(BaseRepository[SleepSession]):
         """
         duration_hours = session.calculate_duration() if session.sleep_end else None
         if sleep_end:
-            delta = sleep_end - session.sleep_start
+            # Ensure both datetimes are timezone-aware or both naive for subtraction
+            import pytz
+            sleep_start = session.sleep_start
+            sleep_end_calc = sleep_end
+
+            # Make both timezone-aware for calculation
+            if sleep_start.tzinfo is None:
+                sleep_start = sleep_start.replace(tzinfo=pytz.UTC)
+            if sleep_end_calc.tzinfo is None:
+                sleep_end_calc = sleep_end_calc.replace(tzinfo=pytz.UTC)
+
+            delta = sleep_end_calc - sleep_start
             duration_hours = round(delta.total_seconds() / 3600, 2)
 
         session = await self.update(

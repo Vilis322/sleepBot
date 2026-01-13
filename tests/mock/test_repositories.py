@@ -17,13 +17,12 @@ class TestUserRepository:
     @pytest.mark.asyncio
     async def test_create_user(self, user_repository: UserRepository, async_session):
         """Test creating a new user."""
-        user = User(
+        created_user = await user_repository.create(
             telegram_id=123456,
             username="testuser",
-            language="en",
+            language_code="en",
             timezone="UTC",
         )
-        created_user = await user_repository.create(user)
 
         assert created_user.id is not None
         assert created_user.telegram_id == 123456
@@ -49,12 +48,12 @@ class TestUserRepository:
     @pytest.mark.asyncio
     async def test_update_user(self, user_repository: UserRepository, test_user: User):
         """Test updating user data."""
-        test_user.language = "ru"
+        test_user.language_code = "ru"
         test_user.timezone = "Europe/Moscow"
 
         updated_user = await user_repository.update(test_user)
 
-        assert updated_user.language == "ru"
+        assert updated_user.language_code == "ru"
         assert updated_user.timezone == "Europe/Moscow"
 
     @pytest.mark.asyncio
@@ -83,7 +82,8 @@ class TestSleepRepository:
 
         assert session.id is not None
         assert session.user_id == test_user.id
-        assert session.sleep_start == now
+        # SQLite doesn't preserve timezone, compare naive datetimes
+        assert session.sleep_start.replace(tzinfo=None) == now.replace(tzinfo=None)
         assert session.sleep_end is None
 
     @pytest.mark.asyncio
@@ -133,7 +133,8 @@ class TestSleepRepository:
 
         ended_session = await sleep_repository.end_sleep_session(active_session, now)
 
-        assert ended_session.sleep_end == now
+        # SQLite doesn't preserve timezone, compare naive datetimes
+        assert ended_session.sleep_end.replace(tzinfo=None) == now.replace(tzinfo=None)
         assert ended_session.duration_hours == pytest.approx(8.0, rel=0.01)
 
     @pytest.mark.asyncio

@@ -36,4 +36,4 @@ COPY . .
 RUN mkdir -p logs
 
 # Run database migrations and start the bot
-CMD alembic upgrade head && python main.py
+CMD sh -c "sleep 2 && alembic upgrade head && python main.py"

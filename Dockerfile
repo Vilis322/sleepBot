@@ -35,5 +35,8 @@ COPY . .
 # Create logs directory
 RUN mkdir -p logs
 
-# Run database migrations and start the bot
-CMD sh -c "sleep 2 && alembic upgrade head && python main.py"
+# Make entrypoint script executable
+RUN chmod +x entrypoint.sh
+
+# Use entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]

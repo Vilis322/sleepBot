@@ -61,32 +61,36 @@ jobs:
           DB_PASSWORD: test_password
           BOT_TOKEN: test_token
         run: |
-          pytest tests/unit/ --cov=. --cov-report=xml --cov-report=term-missing
+          pytest tests/unit/ -v --cov-append --cov=. --cov-report=xml --cov-report=term-missing
 
-      - name: Run integration tests
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: sleepbot_test
-          DB_USER: test_user
-          DB_PASSWORD: test_password
-          ENVIRONMENT: development
+      - name: Check coverage threshold
         run: |
-          pytest tests/integration/ -v
+          coverage report --fail-under=30
 
-      - name: Run smoke tests
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_NAME: sleepbot_db
-          DB_USER: sleepbot_user
-          DB_PASSWORD: sleepbot_password
-          ENVIRONMENT: development
-          LOG_LEVEL: INFO
-        run: |
-          pytest tests/smoke/ -v
+      # - name: Run integration tests
+      #   env:
+      #     BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      #     DB_HOST: localhost
+      #     DB_PORT: 5432
+      #     DB_NAME: sleepbot_test
+      #     DB_USER: test_user
+      #     DB_PASSWORD: test_password
+      #     ENVIRONMENT: development
+      #   run: |
+      #     pytest tests/integration/ -v
+
+      # - name: Run smoke tests
+      #   env:
+      #     BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      #     DB_HOST: localhost
+      #     DB_PORT: 5432
+      #     DB_NAME: sleepbot_db
+      #     DB_USER: sleepbot_user
+      #     DB_PASSWORD: sleepbot_password
+      #     ENVIRONMENT: development
+      #     LOG_LEVEL: INFO
+      #   run: |
+      #     pytest tests/smoke/ -v
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3

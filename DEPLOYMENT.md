@@ -100,67 +100,67 @@ Save and exit (Ctrl+X, then Y, then Enter).
 
 ```bash
 # Build and start containers
-docker compose -f docker-compose.production.yml up -d
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
 
 # View logs
-docker compose -f docker-compose.production.yml logs -f
+docker compose --env-file .env.production -f docker-compose.production.yml logs -f
 
 # Check status
-docker compose -f docker-compose.production.yml ps
+docker compose --env-file .env.production -f docker-compose.production.yml ps
 ```
 
 ### Verify Deployment
 
 ```bash
 # Check bot is running
-docker compose -f docker-compose.production.yml ps bot
+docker compose --env-file .env.production -f docker-compose.production.yml ps bot
 
 # Check database is healthy
-docker compose -f docker-compose.production.yml ps postgres
+docker compose --env-file .env.production -f docker-compose.production.yml ps postgres
 
 # View bot logs (look for "Bot started successfully")
-docker compose -f docker-compose.production.yml logs bot | grep -i "started"
+docker compose --env-file .env.production -f docker-compose.production.yml logs bot | grep -i "started"
 
 # Test database connection
-docker compose -f docker-compose.production.yml exec postgres psql -U sleepbot_user -d sleepbot_db -c "SELECT 1;"
+docker compose --env-file .env.production -f docker-compose.production.yml exec postgres psql -U sleepbot_user -d sleepbot_db -c "SELECT 1;"
 ```
 
 ### Management Commands
 
 ```bash
 # Restart bot
-docker compose -f docker-compose.production.yml restart bot
+docker compose --env-file .env.production -f docker-compose.production.yml restart bot
 
 # Stop everything
-docker compose -f docker-compose.production.yml down
+docker compose --env-file .env.production -f docker-compose.production.yml down
 
 # Update and redeploy
 git pull origin main
-docker compose -f docker-compose.production.yml down
-docker compose -f docker-compose.production.yml build --no-cache
-docker compose -f docker-compose.production.yml up -d
+docker compose --env-file .env.production -f docker-compose.production.yml down
+docker compose --env-file .env.production -f docker-compose.production.yml build --no-cache
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
 
 # View bot logs
-docker compose -f docker-compose.production.yml logs -f bot
+docker compose --env-file .env.production -f docker-compose.production.yml logs -f bot
 
 # View database logs
-docker compose -f docker-compose.production.yml logs -f postgres
+docker compose --env-file .env.production -f docker-compose.production.yml logs -f postgres
 
 # Access database
-docker compose -f docker-compose.production.yml exec postgres psql -U sleepbot_user -d sleepbot_db
+docker compose --env-file .env.production -f docker-compose.production.yml exec postgres psql -U sleepbot_user -d sleepbot_db
 
 # Run migrations manually (if needed)
-docker compose -f docker-compose.production.yml exec bot alembic upgrade head
+docker compose --env-file .env.production -f docker-compose.production.yml exec bot alembic upgrade head
 ```
 
 ### Backup Database
 
 ```bash
 # Create backup
-docker compose -f docker-compose.production.yml exec postgres pg_dump -U sleepbot_user sleepbot_db > backup_$(date +%Y%m%d_%H%M%S).sql
+docker compose --env-file .env.production -f docker-compose.production.yml exec postgres pg_dump -U sleepbot_user sleepbot_db > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Restore from backup
-docker compose -f docker-compose.production.yml exec -T postgres psql -U sleepbot_user sleepbot_db < backup.sql
+docker compose --env-file .env.production -f docker-compose.production.yml exec -T postgres psql -U sleepbot_user sleepbot_db < backup.sql
 ```
 
 ## GitHub Actions CI/CD

@@ -71,14 +71,15 @@ cd /opt/sleepbot
 # 8. Clone repository
 git clone https://github.com/Vilis322/sleepBot.git .
 
-# 9. Create .env file
-nano .env
+# 9. Create .env.production file from example
+cp .env.production.example .env.production
+nano .env.production
 ```
 
-**Paste this into .env file:**
+**Edit .env.production with your values:**
 ```env
-# Telegram Bot Token (get from @BotFather)
-BOT_TOKEN=your_bot_token_here
+# Telegram Bot Token (get from @BotFather - PRODUCTION BOT)
+BOT_TOKEN=your_production_bot_token_here
 
 # Database Configuration
 DB_NAME=sleepbot_db
@@ -88,7 +89,10 @@ DB_PASSWORD=your_strong_password_here
 # Environment
 ENVIRONMENT=production
 LOG_LEVEL=INFO
+DEFAULT_TIMEZONE=UTC
 ```
+
+**IMPORTANT**: Use your **PRODUCTION** bot token, not dev token!
 
 Save and exit (Ctrl+X, then Y, then Enter).
 
@@ -163,14 +167,66 @@ docker compose -f docker-compose.production.yml exec -T postgres psql -U sleepbo
 
 The repository includes automated deployment via GitHub Actions.
 
-### Required Secrets
+### Step-by-Step GitHub Actions Setup
+
+#### 1. Generate SSH Key on Your Server
+
+After completing the first-time server setup, generate SSH key for GitHub Actions:
+
+```bash
+# On your server:
+ssh-keygen -t ed25519 -C "github-actions" -f ~/.ssh/github_actions_key -N ""
+
+# Add public key to authorized_keys
+cat ~/.ssh/github_actions_key.pub >> ~/.ssh/authorized_keys
+
+# Display private key (copy this for GitHub Secrets)
+cat ~/.ssh/github_actions_key
+
+# Copy the ENTIRE output including:
+# -----BEGIN OPENSSH PRIVATE KEY-----
+# ... key content ...
+# -----END OPENSSH PRIVATE KEY-----
+```
+
+**Important**: Keep this private key secure! You'll add it to GitHub Secrets.
+
+#### 2. Configure GitHub Secrets
+
+Go to your GitHub repository: **Settings → Secrets and variables → Actions → New repository secret**
+
+Add these 4 secrets:
+
+| Secret Name | Value | Example |
+|------------|-------|---------|
+| `SERVER_HOST` | Your VPS IP address | `123.45.67.89` |
+| `SERVER_USER` | SSH username on server | `root` or `ubuntu` |
+| `SSH_KEY` | **Entire private key** from step 1 | (paste the full key including BEGIN/END lines) |
+| `BOT_TOKEN` | **DEV bot token** for tests | `123456:ABC-DEF...` |
+
+**Note**:
+- `BOT_TOKEN` in GitHub Secrets = **DEV** token (for running tests)
+- `BOT_TOKEN` in `.env.production` on server = **PRODUCTION** token (for actual bot)
+
+#### 3. Test SSH Connection
+
+Verify GitHub Actions can connect:
+
+```bash
+# From your LOCAL machine (not server):
+ssh -i path/to/github_actions_key your-user@your-server-ip
+
+# If this works, GitHub Actions will work too!
+```
+
+### Required Secrets Summary
 
 Configure these in GitHub repository settings (Settings → Secrets → Actions):
 
 - `SERVER_HOST` - Your server IP or domain
 - `SERVER_USER` - SSH user (usually root or ubuntu)
-- `SSH_KEY` - Private SSH key for authentication
-- `BOT_TOKEN` - Telegram bot token (for tests)
+- `SSH_KEY` - Private SSH key generated above
+- `BOT_TOKEN` - **Development** bot token (for CI/CD tests)
 
 ### Test Coverage Requirements
 

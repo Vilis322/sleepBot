@@ -3,6 +3,8 @@ services:
     image: postgres:15-alpine
     container_name: sleepbot_postgres_prod
     restart: unless-stopped
+    env_file:
+      - .env.production
     environment:
       POSTGRES_DB: ${DB_NAME:-sleepbot_db}
       POSTGRES_USER: ${DB_USER:-sleepbot_user}
@@ -26,6 +28,8 @@ services:
       dockerfile: Dockerfile
     container_name: sleepbot_app
     restart: unless-stopped
+    env_file:
+      - .env.production
     depends_on:
       postgres:
         condition: service_healthy

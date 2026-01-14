@@ -48,6 +48,10 @@ jobs:
           flake8 . --exclude=venv,alembic --max-line-length=100
         continue-on-error: true
 
+      - name: Run mock tests
+        run: |
+          pytest tests/mock/ -v --cov=services --cov=repositories --cov=models --cov-report=xml --cov-report=term-missing
+
       - name: Run unit tests
         env:
           DB_HOST: localhost

@@ -173,7 +173,11 @@ class SleepService:
             return SessionUpdateValidation.SHOW_WARNING, 0.0
 
         now = datetime.now(pytz.UTC)
-        hours_since_wake = (now - session.sleep_end).total_seconds() / 3600
+        # Ensure sleep_end is timezone-aware (SQLite returns naive datetimes)
+        sleep_end = session.sleep_end
+        if sleep_end.tzinfo is None:
+            sleep_end = sleep_end.replace(tzinfo=pytz.UTC)
+        hours_since_wake = (now - sleep_end).total_seconds() / 3600
 
         # Fresh session (< 24 hours)
         if hours_since_wake < 24:

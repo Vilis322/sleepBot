@@ -1,4 +1,4 @@
-.PHONY: help venv venv-install venv-remove venv-status install install-dev db-up db-down db-init db-migrate db-upgrade db-downgrade db-current db-history run test test-unit test-integration test-smoke coverage clean format lint
+.PHONY: help venv venv-install venv-remove venv-status db-up db-down db-clean db-migrate db-upgrade db-downgrade db-current db-history db-reset run test coverage mock unit integration smoke cover format lint clean setup-venv logs ps
 
 help:  ## Show this help message
 	@echo 'Usage: make [target]'
@@ -83,13 +83,6 @@ venv-remove:  ## Remove virtual environment
 		echo "ℹ️  No virtual environment found"; \
 	fi
 
-# Deprecated: Use venv-install instead
-# install:  ## Install production dependencies
-# 	pip3 install -e .
-#
-# install-dev:  ## Install all dependencies including dev tools
-# 	pip3 install -e ".[dev]"
-
 db-up:  ## Start PostgreSQL container
 	docker-compose up -d
 
@@ -128,22 +121,37 @@ db-reset:  ## Reset database (WARNING: deletes all data!)
 run:  ## Run the bot
 	python3 main.py
 
-test:  ## Run all tests with coverage
-	pytest --cov=. --cov-report=term-missing --cov-report=html
+test:  ## Run tests (use: make test [mock|unit|integration|smoke|cover], or no flag for all)
+	@if [ "$(filter-out $@,$(MAKECMDGOALS))" = "mock" ]; then \
+		echo "🧪 Running mock tests..."; \
+		pytest tests/mock/ -v; \
+	elif [ "$(filter-out $@,$(MAKECMDGOALS))" = "unit" ]; then \
+		echo "🧪 Running unit tests..."; \
+		pytest tests/unit/ -v; \
+	elif [ "$(filter-out $@,$(MAKECMDGOALS))" = "integration" ]; then \
+		echo "🧪 Running integration tests..."; \
+		pytest tests/integration/ -v; \
+	elif [ "$(filter-out $@,$(MAKECMDGOALS))" = "smoke" ]; then \
+		echo "🧪 Running smoke tests..."; \
+		pytest tests/smoke/ -v; \
+	elif [ "$(filter-out $@,$(MAKECMDGOALS))" = "cover" ]; then \
+		echo "📊 Running all tests with coverage..."; \
+		pytest tests/ --cov=services --cov=repositories --cov=models --cov=bot --cov=utils --cov=localization --cov-report=term-missing --cov-report=html; \
+		echo ""; \
+		echo "✅ Coverage report generated: htmlcov/index.html"; \
+	else \
+		echo "🧪 Running all tests..."; \
+		pytest tests/ -v; \
+	fi
 
-test-unit:  ## Run only unit tests
-	pytest tests/unit/ -v
-
-test-integration:  ## Run only integration tests
-	pytest tests/integration/ -v
-
-test-smoke:  ## Run only smoke tests
-	pytest tests/smoke/ -v
+# Allow test flags to work without errors
+mock unit integration smoke cover:
+	@:
 
 coverage:  ## Generate and open HTML coverage report
-	pytest --cov=. --cov-report=html
-	@echo "Opening coverage report..."
-	@open htmlcov/index.html || xdg-open htmlcov/index.html
+	pytest tests/ --cov=services --cov=repositories --cov=models --cov=bot --cov=utils --cov=localization --cov-report=html
+	@echo "📊 Opening coverage report..."
+	@open htmlcov/index.html 2>/dev/null || xdg-open htmlcov/index.html 2>/dev/null || echo "✅ Coverage report generated: htmlcov/index.html"
 
 format:  ## Format code with black
 	black .
@@ -176,19 +184,6 @@ setup-venv:  ## Complete setup with virtual environment (RECOMMENDED)
 	@echo ""
 	@echo "Or use the script below (copy-paste):"
 	@echo "source .venv/bin/activate && make venv-install && make db-up && sleep 5 && make db-migrate msg=\"Initial migration\" && make db-upgrade"
-
-# Deprecated: Use setup-venv instead for new projects
-# setup:  ## Complete local setup (install deps, start db, run migrations)
-# 	@echo "📦 Installing dependencies..."
-# 	make install-dev
-# 	@echo "🐘 Starting PostgreSQL..."
-# 	make db-up
-# 	@echo "⏳ Waiting for database to be ready..."
-# 	sleep 3
-# 	@echo "🗄️  Running migrations..."
-# 	make db-upgrade
-# 	@echo "✅ Setup complete! Copy .env.example to .env and fill in your credentials"
-# 	@echo "Then run: make run"
 
 logs:  ## Show docker-compose logs
 	docker-compose logs -f

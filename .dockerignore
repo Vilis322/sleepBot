@@ -67,6 +67,3 @@ Thumbs.db
 # Development tools
 Makefile
 ecosystem.config.js
-
-# Alembic
-alembic.ini

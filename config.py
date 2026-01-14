@@ -3,9 +3,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
+    """Application settings loaded from environment variables.
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    Note: Reads from environment variables set by Docker Compose via env_file directive.
+    No need for env_file in SettingsConfigDict - variables come from container environment.
+    """
+
+    model_config = SettingsConfigDict(extra="ignore")
 
     # Bot configuration
     bot_token: str = Field(..., description="Telegram Bot API token")

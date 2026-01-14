@@ -5,17 +5,13 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
-    environment:
-      POSTGRES_DB: ${DB_NAME:-sleepbot_db}
-      POSTGRES_USER: ${DB_USER:-sleepbot_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sleepbot_user}"]
+      test: ["CMD-SHELL", "pg_isready -U sleepbot_user"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,14 +30,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - BOT_TOKEN=${BOT_TOKEN}
       - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=${DB_NAME:-sleepbot_db}
-      - DB_USER=${DB_USER:-sleepbot_user}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - ENVIRONMENT=production
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - ./logs:/app/logs
     networks:

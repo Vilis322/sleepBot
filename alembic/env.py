@@ -82,8 +82,14 @@ def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
 
     # Create fresh Settings instance to get updated environment variables
+    import os
+    print(f"DEBUG: DB_HOST from os.environ = {os.environ.get('DB_HOST', 'NOT SET')}")
+
     from config import Settings
     fresh_settings = Settings()
+    print(f"DEBUG: fresh_settings.db_host = {fresh_settings.db_host}")
+    print(f"DEBUG: fresh_settings.database_url = {fresh_settings.database_url}")
+
     config.set_main_option("sqlalchemy.url", fresh_settings.database_url)
 
     asyncio.run(run_async_migrations())

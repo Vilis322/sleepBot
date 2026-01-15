@@ -11,14 +11,15 @@ done
 
 echo "PostgreSQL is ready!"
 
-# Additional DNS resolution check and fix for asyncio
-echo "Checking DNS resolution..."
+# Resolve postgres hostname to IP and use it directly
+echo "Resolving postgres IP address..."
 POSTGRES_IP=$(getent hosts "${DB_HOST:-postgres}" | awk '{ print $1 }')
 if [ -n "$POSTGRES_IP" ]; then
-  echo "$POSTGRES_IP ${DB_HOST:-postgres}" >> /etc/hosts
-  echo "Added $POSTGRES_IP ${DB_HOST:-postgres} to /etc/hosts"
+  echo "Resolved ${DB_HOST:-postgres} to $POSTGRES_IP"
+  export DB_HOST="$POSTGRES_IP"
+  echo "Using DB_HOST=$DB_HOST for connections"
 else
-  echo "Warning: Could not resolve ${DB_HOST:-postgres}"
+  echo "Warning: Could not resolve ${DB_HOST:-postgres}, using hostname"
 fi
 
 # Run migrations

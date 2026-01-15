@@ -3,7 +3,7 @@ from logging.config import fileConfig
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.ext.asyncio import async_engine_from_config, create_async_engine
 
 from alembic import context
 
@@ -60,15 +60,15 @@ def do_run_migrations(connection: Connection) -> None:
         context.run_migrations()
 
 
-async def run_async_migrations() -> None:
+async def run_async_migrations(database_url: str) -> None:
     """In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """
 
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+    # Create engine directly with database_url from fresh Settings
+    connectable = create_async_engine(
+        database_url,
         poolclass=pool.NullPool,
     )
 
@@ -90,9 +90,8 @@ def run_migrations_online() -> None:
     print(f"DEBUG: fresh_settings.db_host = {fresh_settings.db_host}")
     print(f"DEBUG: fresh_settings.database_url = {fresh_settings.database_url}")
 
-    config.set_main_option("sqlalchemy.url", fresh_settings.database_url)
-
-    asyncio.run(run_async_migrations())
+    # Run migrations with fresh database_url
+    asyncio.run(run_async_migrations(fresh_settings.database_url))
 
 
 if context.is_offline_mode():

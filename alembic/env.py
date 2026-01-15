@@ -36,9 +36,10 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    # Import settings here to get fresh environment variables
-    from config import settings
-    config.set_main_option("sqlalchemy.url", settings.database_url)
+    # Create fresh Settings instance to get updated environment variables
+    from config import Settings
+    fresh_settings = Settings()
+    config.set_main_option("sqlalchemy.url", fresh_settings.database_url)
 
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
@@ -80,9 +81,10 @@ async def run_async_migrations() -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
 
-    # Import settings here to get fresh environment variables
-    from config import settings
-    config.set_main_option("sqlalchemy.url", settings.database_url)
+    # Create fresh Settings instance to get updated environment variables
+    from config import Settings
+    fresh_settings = Settings()
+    config.set_main_option("sqlalchemy.url", fresh_settings.database_url)
 
     asyncio.run(run_async_migrations())
 

@@ -11,9 +11,15 @@ done
 
 echo "PostgreSQL is ready!"
 
-# Additional DNS resolution check
+# Additional DNS resolution check and fix for asyncio
 echo "Checking DNS resolution..."
-getent hosts "${DB_HOST:-postgres}" || echo "Warning: DNS resolution issues"
+POSTGRES_IP=$(getent hosts "${DB_HOST:-postgres}" | awk '{ print $1 }')
+if [ -n "$POSTGRES_IP" ]; then
+  echo "$POSTGRES_IP ${DB_HOST:-postgres}" >> /etc/hosts
+  echo "Added $POSTGRES_IP ${DB_HOST:-postgres} to /etc/hosts"
+else
+  echo "Warning: Could not resolve ${DB_HOST:-postgres}"
+fi
 
 # Run migrations
 echo "Running database migrations..."

@@ -113,7 +113,7 @@ jobs:
           script: |
             cd /opt/sleepbot
             git pull origin main
-            docker compose -f docker-compose.production.yml down
-            docker compose -f docker-compose.production.yml build --no-cache
-            docker compose -f docker-compose.production.yml up -d
-            docker compose -f docker-compose.production.yml logs -f --tail=50
+            docker compose --env-file .env.production -f docker-compose.production.yml down
+            docker compose --env-file .env.production -f docker-compose.production.yml build --no-cache
+            docker compose --env-file .env.production -f docker-compose.production.yml up -d
+            docker compose --env-file .env.production -f docker-compose.production.yml logs --tail=50

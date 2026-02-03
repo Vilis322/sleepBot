@@ -49,6 +49,13 @@ jobs:
         continue-on-error: true
 
       - name: Run mock tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: sleepbot_test
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          BOT_TOKEN: test_token
         run: |
           pytest tests/mock/ -v --cov=services --cov=repositories --cov=models --cov-report=xml --cov-report=term-missing
 

@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sleepbot_postgres_prod
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sleepbot_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sleepbot_network
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sleepbot_app
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB_HOST=postgres
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - sleepbot_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  sleepbot_network:
+    driver: bridge

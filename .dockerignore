@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Environment files (secrets should not be in image)
+.env
+.env.*
+
+# Tests
+tests/
+pytest.ini
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# Documentation
+*.md
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Development tools
+Makefile
+ecosystem.config.js

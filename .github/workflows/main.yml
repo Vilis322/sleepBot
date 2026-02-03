@@ -58,7 +58,7 @@ jobs:
           DB_PASSWORD: test_password
           BOT_TOKEN: test_token
         run: |
-          pytest tests/mock/ -v --cov=services --cov=repositories --cov=models --cov-report=xml --cov-report=term-missing
+          pytest tests/mock/ -v --cov=services --cov=repositories --cov=models --cov-report=term-missing --cov-fail-under=0
 
       - name: Run unit tests
         env:
@@ -69,7 +69,7 @@ jobs:
           DB_PASSWORD: test_password
           BOT_TOKEN: test_token
         run: |
-          pytest tests/unit/ -v --cov-append --cov=. --cov-report=xml --cov-report=term-missing
+          pytest tests/unit/ -v --cov-append --cov=. --cov-report=xml --cov-report=term-missing --cov-fail-under=0
 
       - name: Check coverage threshold
         run: |

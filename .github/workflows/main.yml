@@ -119,8 +119,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          script_stop: true
           script: |
+            set -e
             cd /opt/sleepbot
             git fetch origin main
             git reset --hard origin/main

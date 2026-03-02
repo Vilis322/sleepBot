@@ -119,9 +119,11 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script_stop: true
           script: |
             cd /opt/sleepbot
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             docker compose --env-file .env.production -f docker-compose.production.yml down
             docker compose --env-file .env.production -f docker-compose.production.yml build --no-cache
             docker compose --env-file .env.production -f docker-compose.production.yml up -d

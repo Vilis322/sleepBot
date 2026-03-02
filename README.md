@@ -1,143 +1,146 @@
 # Sleep Bot
 
-Telegram bot for sleep tracking with multi-language support (English, Russian, Estonian).
+Telegram bot for sleep tracking with multi-language support.
+
+**Try it:** [@sleep_tracks_bot](https://t.me/sleep_tracks_bot)
 
 ## Features
 
-- 🌍 Multi-language support (EN, RU, ET)
-- 😴 Sleep tracking with start/wake commands
-- 📊 Quality rating and notes for each sleep session
-- 📈 Statistics export (CSV/JSON)
-- ⏰ Timezone-aware tracking
-- 🎯 Personal sleep goals and insights
+- Sleep tracking with `/sleep` and `/wake` commands
+- Quality rating (1-10) and notes for each session
+- Personal sleep goals with progress tracking
+- Statistics export (CSV / JSON)
+- Timezone auto-detection via geolocation
+- Multi-language interface (English, Russian, Estonian)
 
 ## Tech Stack
 
-- **Framework**: aiogram 3.x
-- **Database**: PostgreSQL + SQLAlchemy (async)
-- **Logging**: structlog
-- **Testing**: pytest with 95%+ coverage
-- **CI/CD**: GitHub Actions
-- **Deployment**: Docker + Docker Compose
+| Layer | Technology |
+|-------|-----------|
+| Bot framework | aiogram 3.x (async) |
+| Database | PostgreSQL 15 + SQLAlchemy 2.0 (async) |
+| Migrations | Alembic |
+| Validation | Pydantic 2.x |
+| Logging | structlog |
+| Timezone detection | timezonefinder |
+| Testing | pytest + pytest-asyncio |
+| CI/CD | GitHub Actions |
+| Deployment | Docker + Docker Compose |
+
+## Architecture
+
+```
+main.py                     # Entry point, dispatcher setup
+config.py                   # Pydantic settings from env
+database.py                 # Async engine & session factory
+
+bot/
+  handlers/                 # Telegram command & message handlers
+    start.py                #   /start + language selection
+    onboarding.py           #   Onboarding FSM (bedtime, waketime, goals, timezone)
+    sleep.py, wake.py       #   /sleep, /wake — session lifecycle
+    quality.py, note.py     #   /quality, /note — session metadata
+    stats.py                #   /stats — export flow
+    help.py, language.py    #   /help, /language
+  keyboards/                # Inline & reply keyboards
+  states/                   # FSM state groups
+  middlewares/              # Localization middleware (injects lang & loc)
+
+services/                   # Business logic
+  user_service.py           #   User CRUD, onboarding, goals
+  sleep_service.py          #   Session start/stop, quality, notes
+  statistics_service.py     #   Aggregation & export preparation
+
+repositories/               # Data access (SQLAlchemy queries)
+  user_repository.py
+  sleep_repository.py
+
+models/                     # SQLAlchemy ORM models
+  user.py                   #   User, timezone, goals, onboarding status
+  sleep_session.py          #   Sleep session with timestamps, quality, notes
+
+localization/               # i18n service + JSON translations (en, ru, et)
+utils/                      # Logger, CSV/JSON exporters
+```
+
+Layers follow a strict dependency direction: `handlers -> services -> repositories -> models`.
+
+## Bot Commands
+
+| Command | Description |
+|---------|-------------|
+| `/start` | Initialize bot, configure language, sleep goals, and timezone |
+| `/help` | Show available commands |
+| `/language` | Change interface language |
+| `/sleep` | Start sleep tracking |
+| `/wake` | Stop tracking and view session summary |
+| `/quality` | Rate sleep quality (1-10) |
+| `/note` | Add notes about your sleep |
+| `/stats` | View and export sleep statistics |
 
 ## Local Development
 
-### Option 1: Using Make commands (Recommended)
-
-1. Clone the repository
-2. Copy `.env.example` to `.env` and fill in your credentials
-3. Run complete setup:
-   ```bash
-   make setup
-   ```
-   This will:
-   - Install all dependencies
-   - Start PostgreSQL container
-   - Run database migrations
-   
-4. Start the bot:
-   ```bash
-   make run
-   ```
-
-### Option 2: Manual setup
-
-1. Clone the repository
-2. Copy `.env.example` to `.env` and fill in your credentials
-3. Install dependencies:
-   ```bash
-   pip install -e ".[dev]"
-   ```
-4. Start PostgreSQL:
-   ```bash
-   docker-compose up -d
-   ```
-5. Run migrations:
-   ```bash
-   alembic upgrade head
-   ```
-6. Start the bot:
-   ```bash
-   python main.py
-   ```
-
-## Available Make Commands
-
-Run `make help` to see all available commands:
+### Quick start (Make)
 
 ```bash
-make help          # Show all available commands
-make install       # Install production dependencies
-make install-dev   # Install all dependencies including dev tools
-make db-up         # Start PostgreSQL container
-make db-down       # Stop PostgreSQL container
-make db-init       # Initialize database (create tables)
-make db-migrate    # Create new migration
-make run           # Run the bot
-make test          # Run all tests with coverage
-make test-unit     # Run only unit tests
-make format        # Format code with black
-make lint          # Run linters
-make clean         # Clean up generated files
-make setup         # Complete local setup (recommended for first time)
+cp .env.example .env       # Fill in BOT_TOKEN and DB credentials
+make setup                 # Install deps, start PostgreSQL, run migrations
+make run                   # Start the bot
+```
+
+### Manual setup
+
+```bash
+cp .env.example .env
+pip install -e ".[dev]"
+docker-compose up -d       # Start PostgreSQL
+alembic upgrade head       # Run migrations
+python main.py             # Start the bot
+```
+
+### Useful Make commands
+
+```
+make test          Run all tests with coverage
+make test-unit     Run unit tests only
+make format        Format code with black
+make lint          Run flake8
+make db-up         Start PostgreSQL container
+make db-down       Stop PostgreSQL container
+make clean         Clean generated files
 ```
 
 ## Testing
 
 ```bash
-# Run all tests with coverage
 make test
-
-# Or manually:
-pytest --cov=. --cov-report=term-missing --cov-report=html
-
-# Run specific test types
-make test-unit          # Unit tests
-make test-integration   # Integration tests
-make test-smoke         # Smoke tests
+# or
+pytest --cov=. --cov-report=term-missing
 ```
+
+Tests use an in-memory SQLite database (via aiosqlite) — no running PostgreSQL required.
 
 ## Deployment
 
-The bot uses Docker for production deployment. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+Automatically deploys via GitHub Actions on push to `main`:
 
-**Quick Deploy:**
-- Automatically deploys via GitHub Actions on push to `main` branch
-- Uses Docker Compose for container orchestration
-- PostgreSQL data persisted in Docker volumes
+1. Run tests in CI
+2. SSH into server
+3. `git fetch && git reset --hard origin/main`
+4. Rebuild and restart Docker containers
+5. Alembic migrations run on container startup
 
-## Architecture
+See [DEPLOYMENT.md](DEPLOYMENT.md) for server setup details.
 
-The project follows SOLID principles with clear separation of concerns:
+## Environment Variables
 
-- `bot/` - Telegram bot handlers, keyboards, and FSM states
-- `services/` - Business logic layer
-- `repositories/` - Database access layer
-- `models/` - SQLAlchemy database models
-- `schemas/` - Pydantic validation schemas
-- `localization/` - Multi-language support
-- `utils/` - Helper functions and exporters
-
-## Commands
-
-- `/start` - Initialize bot and set preferences
-- `/help` - Show available commands
-- `/language` - Change interface language
-- `/sleep` - Start sleep tracking
-- `/wake` - Stop tracking and view statistics
-- `/quality <rating>` - Rate sleep quality (1-10)
-- `/note <text>` - Add notes about sleep
-- `/stats` - Export sleep statistics
-
-## Database Setup
-
-The bot requires PostgreSQL. You can either:
-1. Use Docker Compose (recommended): `make db-up`
-2. Use existing PostgreSQL server (update `.env` with connection details)
-
-To create a separate database on existing PostgreSQL:
-```sql
-CREATE DATABASE sleepbot_db;
-CREATE USER sleepbot_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE sleepbot_db TO sleepbot_user;
-```
+| Variable | Description |
+|----------|-------------|
+| `BOT_TOKEN` | Telegram Bot API token |
+| `DB_HOST` | PostgreSQL host |
+| `DB_PORT` | PostgreSQL port (default: 5432) |
+| `DB_NAME` | Database name |
+| `DB_USER` | Database user |
+| `DB_PASSWORD` | Database password |
+| `ENVIRONMENT` | `development` or `production` |
+| `LOG_LEVEL` | `DEBUG`, `INFO`, `WARNING`, `ERROR` |

@@ -8,7 +8,9 @@ class OnboardingStates(StatesGroup):
     waiting_for_bedtime = State()
     waiting_for_waketime = State()
     waiting_for_target_hours = State()
-    waiting_for_timezone = State()
+    waiting_for_timezone_location = State()
+    waiting_for_timezone_popular = State()
+    waiting_for_timezone_manual = State()
 
 
 class StatsStates(StatesGroup):

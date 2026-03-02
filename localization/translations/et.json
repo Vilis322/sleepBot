@@ -12,6 +12,16 @@
         "invalid_time": "Vigane aja formaat. Palun kasutage HH:MM formaati (nt 22:00)",
         "invalid_hours": "Vigane tundide arv. Palun sisestage number vahemikus 1 kuni 24",
         "invalid_timezone": "Vigane ajavöönd. Palun sisestage kehtiv ajavöönd (nt Europe/Tallinn)",
+        "timezone_location_prompt": "Määrame teie ajavööndi. Jagage oma asukohta automaatseks tuvastamiseks:",
+        "timezone_share_location": "📍 Jaga asukohta",
+        "timezone_choose_manually": "Vali käsitsi",
+        "timezone_detected": "Ajavöönd tuvastatud: {timezone}",
+        "timezone_location_failed": "Ajavööndi tuvastamine asukoha järgi ebaõnnestus.",
+        "timezone_popular_prompt": "Valige oma ajavöönd:",
+        "timezone_other": "Muu (sisesta käsitsi)",
+        "timezone_manual_prompt": "Sisestage oma ajavöönd (nt Europe/Tallinn, America/New_York):",
+        "timezone_confirmed": "Ajavöönd seatud: {timezone}",
+        "timezone_use_buttons": "Palun kasutage ülaltoodud nuppe või vajutage \"Muu\" käsitsi sisestamiseks.",
         "completed": "✅ Seadistamine lõpetatud! Olete valmis alustama oma une jälgimist.\n\nKasutage /sleep, kui lähete magama ja /wake, kui ärkate."
       }
     },

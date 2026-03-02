@@ -21,6 +21,7 @@ dependencies = [
     "pytz==2024.2",
     "pandas==2.2.3",
     "aiogram-calendar==0.6.0",
+    "timezonefinder>=6.5.0,<7.0",
 ]
 
 [project.optional-dependencies]

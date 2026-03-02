@@ -12,6 +12,16 @@
         "invalid_time": "Invalid time format. Please use HH:MM format (e.g., 22:00)",
         "invalid_hours": "Invalid hours. Please enter a number between 1 and 24",
         "invalid_timezone": "Invalid timezone. Please enter a valid timezone (e.g., Europe/Tallinn)",
+        "timezone_location_prompt": "Let's set your timezone. Share your location for auto-detection:",
+        "timezone_share_location": "📍 Share location",
+        "timezone_choose_manually": "Choose manually",
+        "timezone_detected": "Timezone detected: {timezone}",
+        "timezone_location_failed": "Could not detect timezone from location.",
+        "timezone_popular_prompt": "Select your timezone:",
+        "timezone_other": "Other (type manually)",
+        "timezone_manual_prompt": "Type your timezone (e.g., Europe/Tallinn, America/New_York):",
+        "timezone_confirmed": "Timezone set: {timezone}",
+        "timezone_use_buttons": "Please use the buttons above, or press \"Other\" to type manually.",
         "completed": "✅ Setup completed! You're all set to start tracking your sleep.\n\nUse /sleep when you go to bed and /wake when you wake up."
       }
     },

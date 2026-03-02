@@ -1,6 +1,21 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from localization import LocalizationService
+
+POPULAR_TIMEZONES = [
+    ("UTC", "UTC"),
+    ("Europe/Berlin", "Europe/Berlin (CET)"),
+    ("Europe/Tallinn", "Europe/Tallinn (EET)"),
+    ("Europe/Moscow", "Europe/Moscow (MSK)"),
+    ("Asia/Dubai", "Asia/Dubai (GST)"),
+    ("Asia/Yekaterinburg", "Asia/Yekaterinburg (+05)"),
+    ("Asia/Kolkata", "Asia/Kolkata (IST)"),
+    ("Asia/Shanghai", "Asia/Shanghai (CST)"),
+    ("America/New_York", "America/New_York (EST)"),
+    ("America/Los_Angeles", "America/Los_Angeles (PST)"),
+]
+
 
 def get_language_keyboard() -> InlineKeyboardMarkup:
     """Get language selection keyboard.
@@ -138,6 +153,25 @@ def get_quality_confirmation_keyboard(rating: float, loc, lang: str) -> InlineKe
     cancel_text = loc.get("buttons.cancel", lang)
     builder.button(text=confirm_text, callback_data=f"quality_confirm_{rating}")
     builder.button(text=cancel_text, callback_data="quality_cancel")
+    builder.adjust(2)
+    return builder.as_markup()
+
+
+def get_timezone_popular_keyboard(loc: LocalizationService, lang: str) -> InlineKeyboardMarkup:
+    """Get inline keyboard with popular timezone choices.
+
+    Args:
+        loc: Localization service
+        lang: Language code
+
+    Returns:
+        InlineKeyboard with popular timezones and an "Other" button
+    """
+    builder = InlineKeyboardBuilder()
+    for iana_id, label in POPULAR_TIMEZONES:
+        builder.button(text=label, callback_data=f"tz_{iana_id}")
+    other_text = loc.get("commands.start.onboarding.timezone_other", lang)
+    builder.button(text=other_text, callback_data="tz_other")
     builder.adjust(2)
     return builder.as_markup()
 
